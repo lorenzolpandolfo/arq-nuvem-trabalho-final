@@ -1,0 +1,10 @@
+services:
+  rmq:
+    image: rabbitmq:4.2.1-management-alpine
+    hostname: content_service-rmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest

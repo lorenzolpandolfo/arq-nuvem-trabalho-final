@@ -1,5 +1,22 @@
 # customer_service
 
+Microsserviço responsável pelo gerenciamento de usuários.
+
+## Iniciar
+
+rode:
+```bash
+docker compose down -v
+docker compose up --build
+```
+
+
+## Docs
+acesse http://localhost:8000/api/docs para ver a documentação da API
+
+
+---
+
 This project was generated using fastapi_template.
 
 ## UV

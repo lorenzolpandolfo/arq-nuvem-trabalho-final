@@ -1,3 +1,23 @@
+
+# Content Service
+Microsserviço responsável por lidar com as publicações.
+
+
+## Iniciar
+
+rode:
+```bash
+docker compose down -v
+docker compose up --build
+```
+
+
+## Docs
+acesse http://localhost:8001/api/docs para ver a documentação da API
+
+
+---
+
 # content_service
 
 This project was generated using fastapi_template.

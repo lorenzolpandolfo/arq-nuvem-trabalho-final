@@ -15,8 +15,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      rmq:
-        condition: service_healthy
+#      rmq:
+#        condition: service_healthy
     environment:
       CUSTOMER_SERVICE_HOST: 0.0.0.0
       CUSTOMER_SERVICE_RELOAD: "True"
@@ -47,22 +47,22 @@ services:
       timeout: 3s
       retries: 40
 
-  rmq:
-    image: rabbitmq:4.2.1-management-alpine
-    hostname: "customer_service-rmq"
-    restart: always
-    ports:
-      - 5672:5672
-      - 15672:15672
-    environment:
-      RABBITMQ_DEFAULT_USER: "guest"
-      RABBITMQ_DEFAULT_PASS: "guest"
-      RABBITMQ_DEFAULT_VHOST: "/"
-    healthcheck:
-      test: rabbitmq-diagnostics check_running -q
-      interval: 3s
-      timeout: 3s
-      retries: 50
+#  rmq:
+#    image: rabbitmq:4.2.1-management-alpine
+#    hostname: "customer_service-rmq"
+#    restart: always
+#    ports:
+#      - 5672:5672
+#      - 15672:15672
+#    environment:
+#      RABBITMQ_DEFAULT_USER: "guest"
+#      RABBITMQ_DEFAULT_PASS: "guest"
+#      RABBITMQ_DEFAULT_VHOST: "/"
+#    healthcheck:
+#      test: rabbitmq-diagnostics check_running -q
+#      interval: 3s
+#      timeout: 3s
+#      retries: 50
 
 
 
