@@ -59,7 +59,7 @@ async def shutdown_rabbit(app: FastAPI) -> None:  # pragma: no cover
     await app.state.rmq_channel_pool.close()
     await app.state.rmq_pool.close()
 
-async def publish(
+async def publish_rabbit_message(
     app: FastAPI,
     routing_key: str,
     body: bytes,
