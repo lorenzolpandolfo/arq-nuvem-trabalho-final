@@ -1,4 +1,8 @@
+import asyncio
+import logging
+
 import aio_pika
+from aio_pika import Channel, IncomingMessage
 from aio_pika.abc import AbstractChannel, AbstractRobustConnection
 from aio_pika.pool import Pool
 from fastapi import FastAPI
@@ -6,53 +10,53 @@ from fastapi import FastAPI
 from content_service.settings import settings
 
 
-def init_rabbit(app: FastAPI) -> None:  # pragma: no cover
-    """
-    Initialize rabbitmq pools.
-
-    :param app: current FastAPI application.
-    """
-
+def init_rabbit(app: FastAPI) -> None:
     async def get_connection() -> AbstractRobustConnection:
-        """
-        Creates connection to RabbitMQ using url from settings.
-
-        :return: async connection to RabbitMQ.
-        """
         return await aio_pika.connect_robust(str(settings.rabbit_url))
 
-    # This pool is used to open connections.
     connection_pool: Pool[AbstractRobustConnection] = Pool(
         get_connection,
         max_size=settings.rabbit_pool_size,
     )
 
     async def get_channel() -> AbstractChannel:
-        """
-        Open channel on connection.
-
-        Channels are used to actually communicate with rabbitmq.
-
-        :return: connected channel.
-        """
         async with connection_pool.acquire() as connection:
             return await connection.channel()
 
-    # This pool is used to open channels.
-    channel_pool: Pool[aio_pika.Channel] = Pool(
+    channel_pool: Pool[AbstractChannel] = Pool(
         get_channel,
         max_size=settings.rabbit_channel_pool_size,
     )
 
     app.state.rmq_pool = connection_pool
     app.state.rmq_channel_pool = channel_pool
+    app.state.rabbit_tasks = []
 
 
-async def shutdown_rabbit(app: FastAPI) -> None:  # pragma: no cover
-    """
-    Close all connection and pools.
+async def shutdown_rabbit(app: FastAPI) -> None:
+    for task in getattr(app.state, "rabbit_tasks", []):
+        task.cancel()
 
-    :param app: current application.
-    """
     await app.state.rmq_channel_pool.close()
     await app.state.rmq_pool.close()
+
+
+async def default_handler(message: IncomingMessage) -> None:
+    async with message.process():
+        logging.warning(f"Message: {message.body}")
+        print(message.body.decode())
+
+
+async def _start_consumer(pool: Pool[AbstractChannel], queue_name: str, handler=default_handler) -> None:
+    async with pool.acquire() as channel:
+        queue = await channel.declare_queue(queue_name, durable=True)
+        await queue.consume(handler)
+        await asyncio.Event().wait()
+
+async def start_consumers(app: FastAPI) -> None:
+
+    task = asyncio.create_task(
+        _start_consumer(app.state.rmq_channel_pool, "fila_exemplo")
+    )
+    app.state.rabbit_tasks.append(task)
+    logging.warning(app.state.rabbit_tasks)

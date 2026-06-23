@@ -7,16 +7,13 @@ services:
     image: customer_service:${CUSTOMER_SERVICE_VERSION:-latest}
     restart: always
     ports:
-      # Exposes application port.
-    - "8000:8000"
+      - "8000:8000"
     env_file:
       - path: .env
         required: false
     depends_on:
       db:
         condition: service_healthy
-#      rmq:
-#        condition: service_healthy
     environment:
       CUSTOMER_SERVICE_HOST: 0.0.0.0
       CUSTOMER_SERVICE_RELOAD: "True"
@@ -25,9 +22,11 @@ services:
       CUSTOMER_SERVICE_DB_USER: customer_service
       CUSTOMER_SERVICE_DB_PASS: customer_service
       CUSTOMER_SERVICE_DB_BASE: customer_service
-      CUSTOMER_SERVICE_RABBIT_HOST: customer_service-rmq
+      CUSTOMER_SERVICE_RABBIT_HOST: rmq
     volumes:
       - .:/app/src/
+    networks:
+      - backend
 
   db:
     image: postgres:18.3-trixie
@@ -46,26 +45,13 @@ services:
       interval: 2s
       timeout: 3s
       retries: 40
-
-#  rmq:
-#    image: rabbitmq:4.2.1-management-alpine
-#    hostname: "customer_service-rmq"
-#    restart: always
-#    ports:
-#      - 5672:5672
-#      - 15672:15672
-#    environment:
-#      RABBITMQ_DEFAULT_USER: "guest"
-#      RABBITMQ_DEFAULT_PASS: "guest"
-#      RABBITMQ_DEFAULT_VHOST: "/"
-#    healthcheck:
-#      test: rabbitmq-diagnostics check_running -q
-#      interval: 3s
-#      timeout: 3s
-#      retries: 50
-
-
+    networks:
+      - backend
 
 volumes:
   customer_service-db-data:
     name: customer_service-db-data
+
+networks:
+  backend:
+    external: true

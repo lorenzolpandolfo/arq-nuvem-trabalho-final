@@ -70,7 +70,7 @@ async def lifespan_setup(
     _setup_db(app)
     await _create_tables()
     init_rabbit(app)
-    setup_prometheus(app)
+    # setup_prometheus(app)
     app.middleware_stack = app.build_middleware_stack()
 
     yield

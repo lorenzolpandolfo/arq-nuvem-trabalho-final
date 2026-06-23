@@ -1,3 +1,4 @@
+import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -9,7 +10,8 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from content_service.db.meta import meta
 from content_service.db.models import load_all_models
-from content_service.services.rabbit.lifespan import init_rabbit, shutdown_rabbit
+from content_service.services.rabbit.lifespan import (init_rabbit, shutdown_rabbit,
+                                                      start_consumers)
 from content_service.settings import settings
 
 
@@ -70,6 +72,7 @@ async def lifespan_setup(
     _setup_db(app)
     await _create_tables()
     init_rabbit(app)
+    await start_consumers(app)
     setup_prometheus(app)
     app.middleware_stack = app.build_middleware_stack()
 

@@ -1,3 +1,5 @@
+import logging
+
 import aio_pika
 from aio_pika.abc import AbstractChannel, AbstractRobustConnection
 from aio_pika.pool import Pool
@@ -12,6 +14,9 @@ def init_rabbit(app: FastAPI) -> None:  # pragma: no cover
 
     :param app: current FastAPI application.
     """
+
+    logging.info("###### Initializing RabbitMQ pools: %s", settings.rabbit_url)
+
 
     async def get_connection() -> AbstractRobustConnection:
         """

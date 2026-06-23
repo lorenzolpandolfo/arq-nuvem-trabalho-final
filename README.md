@@ -7,6 +7,15 @@ Trabalho final da disciplina de Arquitetura de Computação em Núvem do UniSena
 links
 
 
+## Setup
+
+Crie a network do docker para que os serviços se comuniquem com o rabbit:
+
+```bash
+docker network create backend
+```
+
+
 ## Iniciar Rabbitmq
 
 rode:

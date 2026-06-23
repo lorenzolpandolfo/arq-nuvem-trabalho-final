@@ -1,10 +1,17 @@
+# docker-compose.rabbit.yml
 services:
   rmq:
     image: rabbitmq:4.2.1-management-alpine
-    hostname: content_service-rmq
+    hostname: rmq
     ports:
       - "5672:5672"
       - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - backend
+
+networks:
+  backend:
+    external: true

@@ -15,8 +15,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-#      rmq:
-#        condition: service_healthy
     environment:
       CONTENT_SERVICE_HOST: 0.0.0.0
       CONTENT_SERVICE_RELOAD: "True"
@@ -25,9 +23,11 @@ services:
       CONTENT_SERVICE_DB_USER: content_service
       CONTENT_SERVICE_DB_PASS: content_service
       CONTENT_SERVICE_DB_BASE: content_service
-      CONTENT_SERVICE_RABBIT_HOST: content_service-rmq
+      CONTENT_SERVICE_RABBIT_HOST: rmq
     volumes:
       - .:/app/src/
+    networks:
+      - backend
 
   db:
     image: postgres:18.3-trixie
@@ -46,26 +46,13 @@ services:
       interval: 2s
       timeout: 3s
       retries: 40
-
-#  rmq:
-#    image: rabbitmq:4.2.1-management-alpine
-#    hostname: "content_service-rmq"
-#    restart: always
-#    ports:
-#      - 5672:5672
-#      - 15672:15672
-#    environment:
-#      RABBITMQ_DEFAULT_USER: "guest"
-#      RABBITMQ_DEFAULT_PASS: "guest"
-#      RABBITMQ_DEFAULT_VHOST: "/"
-#    healthcheck:
-#      test: rabbitmq-diagnostics check_running -q
-#      interval: 3s
-#      timeout: 3s
-#      retries: 50
-
-
+    networks:
+      - backend
 
 volumes:
   content_service-db-data:
     name: content_service-db-data
+
+networks:
+  backend:
+    external: true

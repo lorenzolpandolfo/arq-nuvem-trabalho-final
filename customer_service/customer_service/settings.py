@@ -1,5 +1,7 @@
 import enum
+import logging
 import os
+from logging import INFO
 from pathlib import Path
 from tempfile import gettempdir
 
@@ -85,6 +87,16 @@ class Settings(BaseSettings):
 
         :return: rabbit URL.
         """
+
+        logging.warning(URL.build(
+            scheme="amqp",
+            host=self.rabbit_host,
+            port=self.rabbit_port,
+            user=self.rabbit_user,
+            password=self.rabbit_pass,
+            path=self.rabbit_vhost,
+        ))
+
         return URL.build(
             scheme="amqp",
             host=self.rabbit_host,
