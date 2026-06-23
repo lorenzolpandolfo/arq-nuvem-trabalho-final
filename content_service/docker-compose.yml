@@ -1,0 +1,71 @@
+services:
+  api: &main_app
+    build:
+      context: .
+      target: dev
+      dockerfile: ./Dockerfile
+    image: content_service:${CONTENT_SERVICE_VERSION:-latest}
+    restart: always
+    ports:
+      # Exposes application port.
+    - "8001:8000"
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      db:
+        condition: service_healthy
+#      rmq:
+#        condition: service_healthy
+    environment:
+      CONTENT_SERVICE_HOST: 0.0.0.0
+      CONTENT_SERVICE_RELOAD: "True"
+      CONTENT_SERVICE_DB_HOST: content_service-db
+      CONTENT_SERVICE_DB_PORT: 5432
+      CONTENT_SERVICE_DB_USER: content_service
+      CONTENT_SERVICE_DB_PASS: content_service
+      CONTENT_SERVICE_DB_BASE: content_service
+      CONTENT_SERVICE_RABBIT_HOST: content_service-rmq
+    volumes:
+      - .:/app/src/
+
+  db:
+    image: postgres:18.3-trixie
+    hostname: content_service-db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_PASSWORD: "content_service"
+      POSTGRES_USER: "content_service"
+      POSTGRES_DB: "content_service"
+    volumes:
+      - content_service-db-data:/var/lib/postgresql
+    restart: always
+    healthcheck:
+      test: pg_isready -U content_service
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+#  rmq:
+#    image: rabbitmq:4.2.1-management-alpine
+#    hostname: "content_service-rmq"
+#    restart: always
+#    ports:
+#      - 5672:5672
+#      - 15672:15672
+#    environment:
+#      RABBITMQ_DEFAULT_USER: "guest"
+#      RABBITMQ_DEFAULT_PASS: "guest"
+#      RABBITMQ_DEFAULT_VHOST: "/"
+#    healthcheck:
+#      test: rabbitmq-diagnostics check_running -q
+#      interval: 3s
+#      timeout: 3s
+#      retries: 50
+
+
+
+volumes:
+  content_service-db-data:
+    name: content_service-db-data
