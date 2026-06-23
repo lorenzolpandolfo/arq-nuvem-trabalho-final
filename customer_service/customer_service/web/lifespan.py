@@ -1,3 +1,4 @@
+import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -52,6 +53,7 @@ def setup_prometheus(app: FastAPI) -> None:  # pragma: no cover
     ).expose(app, should_gzip=True, name="prometheus_metrics")
 
 
+
 @asynccontextmanager
 async def lifespan_setup(
     app: FastAPI,
@@ -70,7 +72,7 @@ async def lifespan_setup(
     _setup_db(app)
     await _create_tables()
     init_rabbit(app)
-    # setup_prometheus(app)
+    setup_prometheus(app)
     app.middleware_stack = app.build_middleware_stack()
 
     yield
