@@ -7,6 +7,7 @@ from aio_pika.abc import AbstractChannel, AbstractRobustConnection
 from aio_pika.pool import Pool
 from fastapi import FastAPI
 
+from content_service.services.rabbit.consumer.test_consumer import message_handler
 from content_service.settings import settings
 
 
@@ -54,9 +55,9 @@ async def _start_consumer(pool: Pool[AbstractChannel], queue_name: str, handler=
         await asyncio.Event().wait()
 
 async def start_consumers(app: FastAPI) -> None:
+    # Para registrar um consumidor para uma fila, é preciso mapear aqui
 
     task = asyncio.create_task(
-        _start_consumer(app.state.rmq_channel_pool, "fila_exemplo")
+        _start_consumer(app.state.rmq_channel_pool, "fila_exemplo", handler=message_handler)
     )
     app.state.rabbit_tasks.append(task)
-    logging.warning(app.state.rabbit_tasks)

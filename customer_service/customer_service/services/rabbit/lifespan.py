@@ -1,6 +1,5 @@
-import logging
-
 import aio_pika
+from aio_pika import Message
 from aio_pika.abc import AbstractChannel, AbstractRobustConnection
 from aio_pika.pool import Pool
 from fastapi import FastAPI
@@ -14,8 +13,6 @@ def init_rabbit(app: FastAPI) -> None:  # pragma: no cover
 
     :param app: current FastAPI application.
     """
-
-    logging.info("###### Initializing RabbitMQ pools: %s", settings.rabbit_url)
 
 
     async def get_connection() -> AbstractRobustConnection:
@@ -61,3 +58,14 @@ async def shutdown_rabbit(app: FastAPI) -> None:  # pragma: no cover
     """
     await app.state.rmq_channel_pool.close()
     await app.state.rmq_pool.close()
+
+async def publish(
+    app: FastAPI,
+    routing_key: str,
+    body: bytes,
+) -> None:
+    async with app.state.rmq_channel_pool.acquire() as channel:
+        await channel.default_exchange.publish(
+            Message(body),
+            routing_key=routing_key,
+        )
