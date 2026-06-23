@@ -1,0 +1,26 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="cryptography" />
+          <option value="asyncpg" />
+          <option value="fastapi" />
+          <option value="fastapi-users" />
+          <option value="fastapi-users-db-sqlalchemy" />
+          <option value="gunicorn" />
+          <option value="httptools" />
+          <option value="httpx-oauth" />
+          <option value="pydantic" />
+          <option value="pydantic-settings" />
+          <option value="pymongo" />
+          <option value="sqlalchemy" />
+          <option value="ujson" />
+          <option value="uvicorn" />
+          <option value="yarl" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
