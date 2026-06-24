@@ -1,4 +1,5 @@
 import uuid
+
 from datetime import datetime
 
 from sqlalchemy.dialects.postgresql import UUID
@@ -8,7 +9,7 @@ from content_service.db.base import Base
 
 
 class PostModel(Base):
-    __tablename__ = "posts"
+    __tablename__ = "likes"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -16,10 +17,5 @@ class PostModel(Base):
         default=uuid.uuid4,
     )
 
-    author_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
-
-    description: Mapped[str]
-
-    is_active: Mapped[bool] = mapped_column(default=False)
-
-    created_date: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    to_user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
+    from_user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))

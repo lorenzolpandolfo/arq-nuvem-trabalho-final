@@ -6,3 +6,4 @@ class UserDTO(BaseModel):
     name: str | None = None
     image_url: str | None = None
     is_active: bool | None = None
+    bio: str | None = None

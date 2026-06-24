@@ -21,30 +21,33 @@ from customer_service.services.rabbit.lifespan import (publish_rabbit_message,
 from customer_service.settings import settings
 
 
+DEFAULT_BIO = "Estou usando Lumio."
+
 class User(SQLAlchemyBaseUserTableUUID, Base):
     """Represents a user entity."""
-    fame: Mapped[int] = mapped_column(default=0)
     image_url: Mapped[str | None] = mapped_column(nullable=True)
     name: Mapped[str] = mapped_column()
+    bio: Mapped[str | None] = mapped_column(default=DEFAULT_BIO)
 
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
     """Represents a read command for a user."""
-    fame: int
     image_url: str | None = None
     name: str | None = None
+    bio: str | None = None
 
 class UserCreate(schemas.BaseUserCreate):
     """Represents a create command for a user."""
     image_url: str | None = None
+    bio: str | None = None
     name: str
 
 
 class UserUpdate(schemas.BaseUserUpdate):
     """Represents an update command for a user."""
-    fame: int | None = None
     image_url: str | None = None
     name: str | None = None
+    bio: str | None = None
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     """Manages a user session and its tokens."""
@@ -61,6 +64,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         user_dto = UserDTO(
             id=user.id,
             name=user.name,
+            bio=user.bio,
             image_url=user.image_url,
             is_active=user.is_active
         )
@@ -89,6 +93,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         user_dto = UserDTO(
             id=user.id,
             name=user_update.name,
+            bio=user.bio,
             image_url=user_update.image_url,
             is_active=user_update.is_active
         )
@@ -119,6 +124,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         user_dto = UserDTO(
             id=user.id,
             name=user.name,
+            bio=user.bio,
             image_url=user.image_url,
             is_active=user.is_active
         )

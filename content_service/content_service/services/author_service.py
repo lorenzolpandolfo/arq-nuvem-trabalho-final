@@ -13,19 +13,18 @@ class AuthorService:
         self.author_repository = author_repository
 
     async def on_user_created(self, user: UserDTO):
-        logging.warning("[SERVICE] Usuario criado: %s", user)
 
-        author = AuthorModel(id=user.id, name=user.name, image_url=user.image_url, is_active=user.is_active)
-
+        author = AuthorModel(id=user.id, name=user.name, bio=user.bio, image_url=user.image_url, is_active=user.is_active)
         await self.author_repository.save(author)
 
-        all_authors = await self.author_repository.find_all()
-        logging.warning("Todos autores: %s", all_authors)
+        logging.warning("[SERVICE] Autor criado: %s", user)
+
+        # created_author = await self.author_repository.find_by_id(user.id)
+        # logging.warning("Autor criado: %s", created_author.model_dump())
 
 
 
     async def on_user_updated(self, user: UserDTO):
-        logging.warning("[SERVICE] Usuario atualizado: %s", user)
 
         data = user.model_dump(exclude_unset=True)
 
@@ -35,14 +34,15 @@ class AuthorService:
             if v is not None
         }
 
-        # all_authors = await self.author_repository.find_all()
-        # logging.warning("Todos autores: %s", all_authors)
-
         user_before_update = await self.author_repository.find_by_id(user.id)
-
-        # logging.warning("user before: %s e campos novos: %s", user_before_update, update_data)
-
         await self.author_repository.update(
             user_before_update,
             update_data,
         )
+
+        logging.warning("[SERVICE] Usuario atualizado: %s", user)
+
+        # user_after_update = await self.author_repository.find_by_id(user.id)
+        # logging.warning("Autor atualizado: %s", user_after_update.model_dump(mode="json"))
+
+

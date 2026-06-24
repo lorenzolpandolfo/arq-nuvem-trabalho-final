@@ -15,6 +15,7 @@ class AuthorModel(Base):
         primary_key=True,
     )
     name: Mapped[str]
+    bio: Mapped[str | None]
     image_url: Mapped[str | None] = mapped_column(nullable=True)
 
     is_active: Mapped[bool] = mapped_column(default=False)
