@@ -45,16 +45,15 @@ Verifique que o Prometheus encontrou os serviços corretamente, conforme a image
 
 ## Setup Grafana
 
-Após acessar o Grafana, vá em Connections > Data Sources e selecione o Prometheus. Então, adicione a URL para conectar-se: `http://prometheus:9090`.
+Após acessar o Grafana, vamos adicionar o data source do Prometheus. Vá em Connections > Data Sources e selecione o Prometheus. Clique em **Add new data source**. Então, adicione a URL para conectar-se: `http://prometheus:9090`.
 
-Adicionando o Prometheus
 <img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-38-41" src="https://github.com/user-attachments/assets/d043d854-7063-4d38-9357-2f09d5cd96ef" />
 
 <img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-39-14" src="https://github.com/user-attachments/assets/08cfb156-aa34-44a2-9f61-6c77737ce632" />
 
 
 
-Dashboards de exemplo no Grafana
+## Dashboards de exemplo no Grafana
 
 <img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-41-27" src="https://github.com/user-attachments/assets/78c202f3-aad0-43a1-8d2f-63b168dc3687" />
 
