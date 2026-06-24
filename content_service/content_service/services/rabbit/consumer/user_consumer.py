@@ -6,7 +6,7 @@ from aio_pika import Channel, IncomingMessage
 
 from content_service.dto.userDTO import UserDTO
 from content_service.services.author_service import AuthorService
-from repository.author_repository import AuthorRepository
+from content_service.repository.author_repository import AuthorRepository
 
 
 

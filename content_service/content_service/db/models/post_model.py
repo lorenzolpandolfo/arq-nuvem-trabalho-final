@@ -20,6 +20,6 @@ class PostModel(Base):
 
     description: Mapped[str]
 
-    is_active: Mapped[bool] = mapped_column(default=False)
+    is_active: Mapped[bool] = mapped_column(default=True)
 
     created_date: Mapped[datetime] = mapped_column(default=datetime.utcnow)

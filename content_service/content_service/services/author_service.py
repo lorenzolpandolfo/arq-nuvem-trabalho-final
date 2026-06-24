@@ -2,7 +2,7 @@ import logging
 
 from content_service.db.models.author_model import AuthorModel
 from content_service.dto.userDTO import UserDTO
-from repository.author_repository import AuthorRepository
+from content_service.repository.author_repository import AuthorRepository
 
 
 class AuthorService:

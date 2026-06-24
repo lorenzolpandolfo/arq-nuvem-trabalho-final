@@ -21,6 +21,7 @@ dependencies = [
   "aio-pika >=9.5.8,<10",
   "prometheus-client >=0.23.1,<1",
   "prometheus-fastapi-instrumentator >=7.1.0,<8",
+  "pyjwt>=2.13.0",
 ]
 
 [dependency-groups]
@@ -117,11 +118,11 @@ lint.ignore = [
     "D106",    # Missing docstring in public nested class
     "UP043",   # Unnecessary default argument specified (conflicts with mypy).
 ]
+lint.mccabe = { max-complexity = 10 }
 exclude = [
     "content_service/db/migrations",
     ".venv/"
 ]
-lint.mccabe = { max-complexity = 10 }
 line-length = 88
 
 [tool.ruff.lint.per-file-ignores]

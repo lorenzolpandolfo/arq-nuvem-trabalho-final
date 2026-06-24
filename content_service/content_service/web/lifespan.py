@@ -1,8 +1,16 @@
 import logging
+
+import jwt
+
+from uuid import UUID
+from pydantic import BaseModel
+
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
 from prometheus_fastapi_instrumentator.instrumentation import (
     PrometheusFastApiInstrumentator,
 )
@@ -80,3 +88,33 @@ async def lifespan_setup(
     await app.state.db_engine.dispose()
 
     await shutdown_rabbit(app)
+
+
+class AuthenticatedUser(BaseModel):
+    id: UUID
+
+
+security = HTTPBearer()
+
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> AuthenticatedUser:
+
+    logging.warning(f"Bearer {credentials.credentials}")
+
+    try:
+        payload = jwt.decode(
+            credentials.credentials,
+            settings.users_secret,
+            algorithms=["HS256"],
+            audience="fastapi-users:auth",
+        )
+
+        return AuthenticatedUser(
+            id=payload["sub"],
+        )
+
+    except Exception as err:
+        logging.warning(f"Erro: %s", err)
+
+        raise HTTPException(status_code=401)

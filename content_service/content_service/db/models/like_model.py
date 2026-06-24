@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from content_service.db.base import Base
 
 
-class PostModel(Base):
+class LikeModel(Base):
     __tablename__ = "likes"
 
     id: Mapped[uuid.UUID] = mapped_column(

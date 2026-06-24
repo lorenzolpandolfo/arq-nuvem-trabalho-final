@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from content_service.db.models.author_model import AuthorModel
-from repository.abstract_repository import AbstractRepository
+from content_service.repository.abstract_repository import AbstractRepository
 
 
 class AuthorRepository(AbstractRepository[AuthorModel]):

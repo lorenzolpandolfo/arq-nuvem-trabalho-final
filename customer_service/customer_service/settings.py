@@ -41,7 +41,8 @@ class Settings(BaseSettings):
     environment: str = "dev"
 
     log_level: LogLevel = LogLevel.INFO
-    users_secret: str = os.getenv("USERS_SECRET", "")
+    # definido hardcoded para simplificar o setup
+    users_secret: str = "lumiolumiolumiolumiolumiolumiolumiolumiolumiolumio"
     # Variables for the database
     db_host: str = "localhost"
     db_port: int = 5432
