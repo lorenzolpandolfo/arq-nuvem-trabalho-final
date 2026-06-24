@@ -42,4 +42,10 @@ imagem_de_exemplo_login
 
 Após acessar o Grafana, vá em Connections > Data Sources e selecione o Prometheus. Então, adicione a URL para conectar-se: `http://prometheus:9090`.
 
-imagem_de_exemplo
+Adicionando o Prometheus
+<img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-25-35" src="https://github.com/user-attachments/assets/fb6c0ad3-f581-4174-8902-3088edd5ea4b" />
+
+
+
+Dashboard de exemplo Grafana
+<img width="1280" height="720" alt="Captura de tela de 2026-06-23 20-50-57" src="https://github.com/user-attachments/assets/cff95455-8e31-45a0-a0b2-5cd669aa9ede" />
