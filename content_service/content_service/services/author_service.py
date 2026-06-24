@@ -1,6 +1,7 @@
 import logging
 
 from content_service.db.models.author_model import AuthorModel
+from content_service.dto.author_response import AuthorsResponse, AuthorResponse
 from content_service.dto.userDTO import UserDTO
 from content_service.repository.author_repository import AuthorRepository
 
@@ -13,19 +14,13 @@ class AuthorService:
         self.author_repository = author_repository
 
     async def on_user_created(self, user: UserDTO):
-
         author = AuthorModel(id=user.id, name=user.name, bio=user.bio, image_url=user.image_url, is_active=user.is_active)
         await self.author_repository.save(author)
 
-        logging.warning("[SERVICE] Autor criado: %s", user)
-
-        # created_author = await self.author_repository.find_by_id(user.id)
-        # logging.warning("Autor criado: %s", created_author.model_dump())
-
+        logging.warning("[author-service] Autor criado: %s", user)
 
 
     async def on_user_updated(self, user: UserDTO):
-
         data = user.model_dump(exclude_unset=True)
 
         update_data = {
@@ -39,10 +34,21 @@ class AuthorService:
             user_before_update,
             update_data,
         )
-
-        logging.warning("[SERVICE] Usuario atualizado: %s", user)
-
-        # user_after_update = await self.author_repository.find_by_id(user.id)
-        # logging.warning("Autor atualizado: %s", user_after_update.model_dump(mode="json"))
+        logging.warning("[author-service] Usuario atualizado: %s", user)
 
 
+    async def get_authors(self) -> AuthorsResponse:
+        authors = await self.author_repository.find_all_ordered_by_likes()
+
+        return AuthorsResponse(
+            authors=[
+                AuthorResponse(
+                    id=author.id,
+                    image_url=author.image_url,
+                    name=author.name,
+                    bio=author.bio,
+                    likes=author.likes,
+                )
+                for author in authors
+            ]
+        )

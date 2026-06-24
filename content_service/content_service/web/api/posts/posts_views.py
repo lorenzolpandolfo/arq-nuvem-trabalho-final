@@ -9,7 +9,7 @@ from content_service.repository.post_repository import PostRepository
 from content_service.services.post_service import PostService
 from content_service.web.lifespan import AuthenticatedUser, get_current_user
 
-router = APIRouter()
+router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
 def get_service(
@@ -23,7 +23,7 @@ def get_service(
 class CreatePostRequest(BaseModel):
     description: str
 
-@router.post("/post", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def create_post(
     request: CreatePostRequest,
     user: Annotated[AuthenticatedUser, Depends(get_current_user)],
@@ -35,7 +35,7 @@ async def create_post(
     )
     return {"status": "success"}
 
-@router.get("/posts", status_code=status.HTTP_200_OK)
+@router.get("", status_code=status.HTTP_200_OK)
 async def get_posts(
     service: Annotated[PostService, Depends(get_service)],
 ):
