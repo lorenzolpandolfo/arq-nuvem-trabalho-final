@@ -15,26 +15,36 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from customer_service.db.base import Base
 from customer_service.db.dependencies import get_db_session
-from customer_service.services.rabbit.lifespan import publish_rabbit_message
+from customer_service.dto.userDTO import UserDTO
+from customer_service.services.rabbit.lifespan import (publish_rabbit_message,
+                                                       publish_rabbit_message_to_json)
 from customer_service.settings import settings
 
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
     """Represents a user entity."""
     fame: Mapped[int] = mapped_column(default=0)
+    image_url: Mapped[str | None] = mapped_column(nullable=True)
+    name: Mapped[str] = mapped_column()
 
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
     """Represents a read command for a user."""
     fame: int
+    image_url: str | None = None
+    name: str | None = None
 
 class UserCreate(schemas.BaseUserCreate):
     """Represents a create command for a user."""
+    image_url: str | None = None
+    name: str
 
 
 class UserUpdate(schemas.BaseUserUpdate):
     """Represents an update command for a user."""
     fame: int | None = None
+    image_url: str | None = None
+    name: str | None = None
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     """Manages a user session and its tokens."""
@@ -42,13 +52,87 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     reset_password_token_secret = settings.users_secret
     verification_token_secret = settings.users_secret
 
+    # Producer customer.user.created
     async def on_after_register(
         self,
         user: User,
         request=None,
     ):
-        logging.warning("Usuario registrado com sucesso. - Enviando na fila [customer.user.created] o id %s", user.id)
-        await publish_rabbit_message(request.app, "customer.user.created", user.id)
+        user_dto = UserDTO(
+            id=user.id,
+            name=user.name,
+            image_url=user.image_url,
+            is_active=user.is_active
+        )
+        user_dto_json = user_dto.model_dump(mode="json")
+
+        logging.warning("Usuario criado com sucesso - Enviando na fila [customer.user.created] %s", user_dto_json)
+
+        await publish_rabbit_message_to_json(request.app, "customer.user.created", user_dto_json)
+
+
+    # Producer customer.user.updated
+    async def update(
+        self,
+        user_update,
+        user,
+        safe: bool = False,
+        request=None,
+    ):
+        updated_user = await super().update(
+            user_update,
+            user,
+            safe=safe,
+            request=request,
+        )
+
+        user_dto = UserDTO(
+            id=user.id,
+            name=user_update.name,
+            image_url=user_update.image_url,
+            is_active=user_update.is_active
+        )
+        user_dto_json = user_dto.model_dump(mode="json")
+
+        logging.warning("Usuario atualizado com sucesso - Enviando na fila [customer.user.updated] %s",
+                        user_dto_json)
+
+        await publish_rabbit_message_to_json(
+            request.app,
+            "customer.user.updated",
+            user_dto_json,
+        )
+
+        return updated_user
+
+    # Producer customer.user.deleted
+    async def delete(
+        self,
+        user,
+        request=None,
+    ):
+        await super().delete(
+            user,
+            request=request,
+        )
+
+        user_dto = UserDTO(
+            id=user.id,
+            name=user.name,
+            image_url=user.image_url,
+            is_active=user.is_active
+        )
+        user_dto_json = user_dto.model_dump(mode="json")
+
+        logging.warning("Usuario deletado com sucesso - Enviando na fila [customer.user.deleted]", user_dto_json)
+
+        await publish_rabbit_message_to_json(
+            request.app,
+            "customer.user.deleted",
+            user_dto_json,
+        )
+
+
 
 
 

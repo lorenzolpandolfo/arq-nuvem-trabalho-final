@@ -7,8 +7,9 @@ from aio_pika.abc import AbstractChannel, AbstractRobustConnection
 from aio_pika.pool import Pool
 from fastapi import FastAPI
 
-from content_service.services.rabbit.consumer.on_user_created_consumer import \
-    on_user_created_handler
+from content_service.services.rabbit.consumer.user_consumer import \
+    (build_on_user_created_handler, build_on_user_updated_handler,
+     build_on_user_deleted_handler)
 from content_service.services.rabbit.consumer.test_consumer import test_message_handler
 from content_service.settings import settings
 
@@ -86,6 +87,7 @@ def _register_consumer(
 
 async def start_consumers(app: FastAPI) -> None:
     # Para registrar um consumidor para uma fila, é preciso mapear aqui
+    session_factory = app.state.db_session_factory
 
     _register_consumer(
         app,
@@ -96,5 +98,17 @@ async def start_consumers(app: FastAPI) -> None:
     _register_consumer(
         app,
         "customer.user.created",
-        on_user_created_handler,
+        build_on_user_created_handler(session_factory),
+    )
+
+    _register_consumer(
+        app,
+        "customer.user.updated",
+        build_on_user_updated_handler(session_factory),
+    )
+
+    _register_consumer(
+        app,
+        "customer.user.deleted",
+        build_on_user_deleted_handler(session_factory),
     )

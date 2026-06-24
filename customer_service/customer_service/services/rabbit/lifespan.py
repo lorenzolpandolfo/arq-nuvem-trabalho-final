@@ -1,3 +1,4 @@
+import json
 from typing import Any
 
 import aio_pika
@@ -70,5 +71,17 @@ async def publish_rabbit_message(
     async with app.state.rmq_channel_pool.acquire() as channel:
         await channel.default_exchange.publish(
             Message(str(body).encode()),
+            routing_key=routing_key,
+        )
+
+async def publish_rabbit_message_to_json(
+    app: FastAPI,
+    routing_key: str,
+    body: Any,
+) -> None:
+
+    async with app.state.rmq_channel_pool.acquire() as channel:
+        await channel.default_exchange.publish(
+            Message(json.dumps(body).encode()),
             routing_key=routing_key,
         )
