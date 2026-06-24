@@ -29,7 +29,9 @@ Para iniciar os microsserviços, confira o `README.md` de cada um deles.
 
 ## Monitoramento
 
-Acesse [Prometheus](http://localhost:9090/) e [Grafana](http://localhost:3000/) por estes links. O endpoint de métricas do Prometheus é `localhost:8000/metrics`
+Acesse [Prometheus](http://localhost:9090/) e [Grafana](http://localhost:3000/) por estes links. O endpoint de métricas do Prometheus é `localhost:8000/metrics`.
+
+E acesse o dashboard do [RabbitMQ](http://localhost:15672/) por este link.
 
 Acesso padrão do grafana:
 - usuário: `admin`
@@ -60,4 +62,26 @@ Após acessar o Grafana, vamos adicionar o data source do Prometheus. Vá em Con
 <img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-57-52" src="https://github.com/user-attachments/assets/5e2ec8d5-e39b-44dc-83b2-3ec6ec256072" />
 
 <img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-59-47" src="https://github.com/user-attachments/assets/41628efb-0966-4bd7-a9c8-1d05edd86965" />
+
+
+## Logs da aplicação
+
+logs do customer-service rodando e enviando mensagens para o content-service via rabbitmq:
+
+<img width="3072" height="1856" alt="image" src="https://github.com/user-attachments/assets/684dc642-915a-4d44-ae24-97d8ad306fae" />
+
+logs do content-service recebendo as mensagens:
+
+<img width="3072" height="1856" alt="image" src="https://github.com/user-attachments/assets/5acbd393-e78c-479f-ba9e-028bc5a9fb49" />
+
+
+## Dashboard RabbitMQ
+
+Envio das mensagens na fila de exemplo:
+
+<img width="3072" height="1856" alt="image" src="https://github.com/user-attachments/assets/5a3f8f7c-5c25-4dab-98cd-ae80bf3fe32d" />
+
+Conexões ativas no RabbitMQ - customer-service e content-service:
+<img width="3072" height="1856" alt="image" src="https://github.com/user-attachments/assets/87f4d33d-c0ce-4e4e-8264-fac1b44315c5" />
+
 
