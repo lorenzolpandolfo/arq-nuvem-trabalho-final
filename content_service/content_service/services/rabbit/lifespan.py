@@ -7,7 +7,9 @@ from aio_pika.abc import AbstractChannel, AbstractRobustConnection
 from aio_pika.pool import Pool
 from fastapi import FastAPI
 
-from content_service.services.rabbit.consumer.test_consumer import message_handler
+from content_service.services.rabbit.consumer.on_user_created_consumer import \
+    on_user_created_handler
+from content_service.services.rabbit.consumer.test_consumer import test_message_handler
 from content_service.settings import settings
 
 
@@ -48,16 +50,51 @@ async def default_handler(message: IncomingMessage) -> None:
         print(message.body.decode())
 
 
-async def _start_consumer(pool: Pool[AbstractChannel], queue_name: str, handler=default_handler) -> None:
+async def _start_consumer(
+    pool: Pool[AbstractChannel],
+    queue_name: str,
+    handler=default_handler,
+) -> None:
     async with pool.acquire() as channel:
-        queue = await channel.declare_queue(queue_name, durable=True)
+        queue = await channel.declare_queue(
+            queue_name,
+            durable=True,
+        )
+
         await queue.consume(handler)
-        await asyncio.Event().wait()
+
+        try:
+            await asyncio.Event().wait()
+        except asyncio.CancelledError:
+            return
+
+
+def _register_consumer(
+    app: FastAPI,
+    queue_name: str,
+    handler=default_handler,
+):
+    task = asyncio.create_task(
+        _start_consumer(
+            app.state.rmq_channel_pool,
+            queue_name,
+            handler,
+        )
+    )
+    app.state.rabbit_tasks.append(task)
+
 
 async def start_consumers(app: FastAPI) -> None:
     # Para registrar um consumidor para uma fila, é preciso mapear aqui
 
-    task = asyncio.create_task(
-        _start_consumer(app.state.rmq_channel_pool, "fila_exemplo", handler=message_handler)
+    _register_consumer(
+        app,
+        "fila_exemplo",
+        test_message_handler,
     )
-    app.state.rabbit_tasks.append(task)
+
+    _register_consumer(
+        app,
+        "customer.user.created",
+        on_user_created_handler,
+    )

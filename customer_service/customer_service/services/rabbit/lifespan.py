@@ -1,3 +1,5 @@
+from typing import Any
+
 import aio_pika
 from aio_pika import Message
 from aio_pika.abc import AbstractChannel, AbstractRobustConnection
@@ -62,10 +64,11 @@ async def shutdown_rabbit(app: FastAPI) -> None:  # pragma: no cover
 async def publish_rabbit_message(
     app: FastAPI,
     routing_key: str,
-    body: bytes,
+    body: Any,
 ) -> None:
+
     async with app.state.rmq_channel_pool.acquire() as channel:
         await channel.default_exchange.publish(
-            Message(body),
+            Message(str(body).encode()),
             routing_key=routing_key,
         )

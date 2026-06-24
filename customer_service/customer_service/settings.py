@@ -88,23 +88,12 @@ class Settings(BaseSettings):
         :return: rabbit URL.
         """
 
-        logging.warning(URL.build(
-            scheme="amqp",
-            host=self.rabbit_host,
-            port=self.rabbit_port,
-            user=self.rabbit_user,
-            password=self.rabbit_pass,
-            path=self.rabbit_vhost,
-        ))
+        rabbit_connect_url = URL.build(scheme="amqp", host=self.rabbit_host, port=self.rabbit_port,
+                          user=self.rabbit_user, password=self.rabbit_pass,
+                          path=self.rabbit_vhost, )
 
-        return URL.build(
-            scheme="amqp",
-            host=self.rabbit_host,
-            port=self.rabbit_port,
-            user=self.rabbit_user,
-            password=self.rabbit_pass,
-            path=self.rabbit_vhost,
-        )
+        logging.warning("[RabbitMQ] Conectando-se a URL: %s", rabbit_connect_url)
+        return rabbit_connect_url
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -1,3 +1,4 @@
+import logging
 import uuid
 from collections.abc import AsyncGenerator
 
@@ -10,19 +11,22 @@ from fastapi_users.authentication import (
 )
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID, SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Mapped, mapped_column
 
 from customer_service.db.base import Base
 from customer_service.db.dependencies import get_db_session
+from customer_service.services.rabbit.lifespan import publish_rabbit_message
 from customer_service.settings import settings
 
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
     """Represents a user entity."""
+    fame: Mapped[int] = mapped_column(default=0)
 
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
     """Represents a read command for a user."""
-
+    fame: int
 
 class UserCreate(schemas.BaseUserCreate):
     """Represents a create command for a user."""
@@ -30,13 +34,22 @@ class UserCreate(schemas.BaseUserCreate):
 
 class UserUpdate(schemas.BaseUserUpdate):
     """Represents an update command for a user."""
-
+    fame: int | None = None
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     """Manages a user session and its tokens."""
 
     reset_password_token_secret = settings.users_secret
     verification_token_secret = settings.users_secret
+
+    async def on_after_register(
+        self,
+        user: User,
+        request=None,
+    ):
+        logging.warning("Usuario registrado com sucesso. - Enviando na fila [customer.user.created] o id %s", user.id)
+        await publish_rabbit_message(request.app, "customer.user.created", user.id)
+
 
 
 async def get_user_db(
