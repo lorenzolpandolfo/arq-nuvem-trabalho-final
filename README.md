@@ -29,16 +29,17 @@ Para iniciar os microsserviços, confira o `README.md` de cada um deles.
 
 ## Monitoramento
 
-Acesse [Prometheus](http://localhost:9090/) e [Grafana](http://localhost:3000/) por estes links. O endpoint de métricas do Prometheus é `localhost:8000/metrics`.
+Acesse [Prometheus](http://localhost:9090/) e [Grafana](http://localhost:3000/) por estes links. O endpoint de métricas do Prometheus é `localhost:8000/metrics`
 
 Acesso padrão do grafana:
 - usuário: `admin`
 - senha: `admin`
 
-imagem_de_exemplo_login
+<img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-36-14" src="https://github.com/user-attachments/assets/29bfbf43-cbab-4ce5-9258-f609cbb06301" />
 
-Verifique que o Prometheus encontrou o serviço corretamente, conforme a imagem abaixo
-<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/097b005a-717a-48ed-aa4f-0ae44b2d67be" />
+
+Verifique que o Prometheus encontrou os serviços corretamente, conforme a imagem abaixo:
+<img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-37-01" src="https://github.com/user-attachments/assets/303358a9-39ca-4562-baa9-83554b7a32a2" />
 
 
 ## Setup Grafana
@@ -46,9 +47,11 @@ Verifique que o Prometheus encontrou o serviço corretamente, conforme a imagem 
 Após acessar o Grafana, vá em Connections > Data Sources e selecione o Prometheus. Então, adicione a URL para conectar-se: `http://prometheus:9090`.
 
 Adicionando o Prometheus
-<img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-25-35" src="https://github.com/user-attachments/assets/fb6c0ad3-f581-4174-8902-3088edd5ea4b" />
+<img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-38-41" src="https://github.com/user-attachments/assets/d043d854-7063-4d38-9357-2f09d5cd96ef" />
 
+<img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-39-14" src="https://github.com/user-attachments/assets/08cfb156-aa34-44a2-9f61-6c77737ce632" />
 
 
 Dashboard de exemplo Grafana
-<img width="1280" height="720" alt="Captura de tela de 2026-06-23 20-50-57" src="https://github.com/user-attachments/assets/cff95455-8e31-45a0-a0b2-5cd669aa9ede" />
+<img width="3072" height="1856" alt="Captura de tela de 2026-06-23 21-41-27" src="https://github.com/user-attachments/assets/78c202f3-aad0-43a1-8d2f-63b168dc3687" />
+
