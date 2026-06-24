@@ -29,13 +29,16 @@ Para iniciar os microsserviços, confira o `README.md` de cada um deles.
 
 ## Monitoramento
 
-Acessar [Prometheus](http://localhost:9090/) e [Grafana](http://localhost:3000/) por estes links. O endpoint de métricas do Prometheus é `localhost:8000/metrics`.
+Acesse [Prometheus](http://localhost:9090/) e [Grafana](http://localhost:3000/) por estes links. O endpoint de métricas do Prometheus é `localhost:8000/metrics`.
 
 Acesso padrão do grafana:
 - usuário: `admin`
 - senha: `admin`
 
 imagem_de_exemplo_login
+
+Verifique que o Prometheus encontrou o serviço corretamente, conforme a imagem abaixo
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/097b005a-717a-48ed-aa4f-0ae44b2d67be" />
 
 
 ## Setup Grafana
