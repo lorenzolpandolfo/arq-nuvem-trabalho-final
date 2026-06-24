@@ -1,5 +1,5 @@
 services:
-  api: &main_app
+  customer-service: &main_app
     build:
       context: .
       target: dev

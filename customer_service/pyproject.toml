@@ -7,7 +7,7 @@ authors = []
 maintainers = []
 readme = "README.md"
 dependencies = [
-  "fastapi >=0.122.0,<1",
+  "fastapi ==0.115.*",
   "uvicorn[standard] >=0.38.0,<1",
   "gunicorn >=23.0.0,<24",
   "fastapi-users >=15.0.1,<16",
