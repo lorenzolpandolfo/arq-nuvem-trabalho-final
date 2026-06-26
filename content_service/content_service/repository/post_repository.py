@@ -1,4 +1,6 @@
-from sqlalchemy import select
+from uuid import UUID
+
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from content_service.db.models.author_model import AuthorModel
@@ -30,6 +32,49 @@ class PostRepository(AbstractRepository[PostModel]):
                 AuthorModel.is_active.is_(True),
             )
             .order_by(PostModel.created_date.desc())
+        )
+
+        return result.mappings().all()
+
+
+    async def count_by_author(self, author_id):
+        result = await self._session.execute(
+            select(func.count())
+            .select_from(PostModel)
+            .where(
+                PostModel.author_id == author_id,
+                PostModel.is_active.is_(True),
+            )
+        )
+
+        return result.scalar_one()
+
+
+
+    async def find_by_author(
+        self,
+        author_id: UUID,
+        limit: int = 20,
+        offset: int = 0,
+    ):
+        result = await self._session.execute(
+            select(
+                AuthorModel.name.label("author"),
+                AuthorModel.image_url,
+                PostModel.description,
+                PostModel.created_date.label("created_at"),
+            )
+            .join(
+                AuthorModel,
+                AuthorModel.id == PostModel.author_id,
+            )
+            .where(
+                PostModel.author_id == author_id,
+                PostModel.is_active.is_(True),
+            )
+            .order_by(PostModel.created_date.desc())
+            .limit(limit)
+            .offset(offset)
         )
 
         return result.mappings().all()

@@ -1,4 +1,5 @@
 import logging
+from typing import Annotated
 
 import jwt
 
@@ -95,6 +96,7 @@ class AuthenticatedUser(BaseModel):
 
 
 security = HTTPBearer()
+optional_security = HTTPBearer(auto_error=False)
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -118,3 +120,25 @@ async def get_current_user(
         logging.warning(f"Erro: %s", err)
 
         raise HTTPException(status_code=401)
+
+
+async def get_optional_current_user(
+    credentials: Annotated[
+        HTTPAuthorizationCredentials | None,
+        Depends(optional_security),
+    ],
+) -> AuthenticatedUser | None:
+
+    if credentials is None:
+        return None
+
+    payload = jwt.decode(
+        credentials.credentials,
+        settings.users_secret,
+        algorithms=["HS256"],
+        audience="fastapi-users:auth",
+    )
+
+    return AuthenticatedUser(
+        id=payload["sub"],
+    )

@@ -1,10 +1,12 @@
 from typing import Annotated
+from uuid import UUID
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Response, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 
 from content_service.db.dependencies import get_db_session
+from content_service.dto.posts_by_user_response import PostsByUserIdResponse
 from content_service.repository.post_repository import PostRepository
 from content_service.services.post_service import PostService
 from content_service.web.lifespan import AuthenticatedUser, get_current_user
@@ -42,3 +44,20 @@ async def get_posts(
     return {
         "posts": await service.get_feed(),
     }
+
+
+@router.get("/author/{author_id}", response_model=PostsByUserIdResponse)
+async def get_posts(
+    author_id: UUID,
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    service: Annotated[
+        PostService,
+        Depends(get_service),
+    ] = None,
+):
+    return await service.get_posts_by_author(
+        author_id,
+        limit,
+        offset,
+    )

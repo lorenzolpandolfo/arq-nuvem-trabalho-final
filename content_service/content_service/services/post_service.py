@@ -4,15 +4,12 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from content_service.db.models.post_model import PostModel
+from content_service.dto.post_response import PostResponse
+from content_service.dto.posts_by_user_response import (PostsByUserIdResponse,
+                                                        PostByUserIdDTO)
 from content_service.repository.post_repository import PostRepository
 
 
-class PostResponse(BaseModel):
-    author_id: UUID
-    author_name: str
-    author_image_url: str | None
-    description: str
-    created_date: datetime
 
 
 class PostService:
@@ -37,3 +34,22 @@ class PostService:
             for row in rows
         ]
 
+
+    async def get_posts_by_author(
+        self,
+        author_id: UUID,
+        limit: int,
+        offset: int,
+    ) -> PostsByUserIdResponse:
+        posts = await self.post_repository.find_by_author(
+            author_id,
+            limit,
+            offset,
+        )
+
+        return PostsByUserIdResponse(
+            posts=[
+                PostByUserIdDTO.model_validate(post)
+                for post in posts
+            ]
+        )

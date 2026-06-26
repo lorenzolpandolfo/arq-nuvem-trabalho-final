@@ -5,6 +5,8 @@ from fastapi import Depends
 from aio_pika import Channel, IncomingMessage
 
 from content_service.dto.userDTO import UserDTO
+from content_service.repository.like_repository import LikeRepository
+from content_service.repository.post_repository import PostRepository
 from content_service.services.author_service import AuthorService
 from content_service.repository.author_repository import AuthorRepository
 
@@ -18,8 +20,12 @@ def build_on_user_created_handler(session_factory):
             user = UserDTO.model_validate_json(message.body)
 
             async with session_factory() as session:
-                repo = AuthorRepository(session)
-                service = AuthorService(repo)
+                author_repository = AuthorRepository(session)
+                like_repository = LikeRepository(session)
+                post_repository = PostRepository(session)
+
+                service = AuthorService(author_repository, post_repository,
+                                        like_repository)
 
                 await service.on_user_created(user)
                 await session.commit()
@@ -36,8 +42,12 @@ def build_on_user_updated_handler(session_factory):
             user = UserDTO.model_validate_json(message.body)
 
             async with session_factory() as session:
-                repo = AuthorRepository(session)
-                service = AuthorService(repo)
+                author_repository = AuthorRepository(session)
+                like_repository = LikeRepository(session)
+                post_repository = PostRepository(session)
+
+                service = AuthorService(author_repository, post_repository,
+                                        like_repository)
 
                 await service.on_user_updated(user)
                 await session.commit()
@@ -55,8 +65,11 @@ def build_on_user_deleted_handler(session_factory):
             user = UserDTO.model_validate_json(message.body)
 
             async with session_factory() as session:
-                repo = AuthorRepository(session)
-                service = AuthorService(repo)
+                author_repository = AuthorRepository(session)
+                like_repository = LikeRepository(session)
+                post_repository = PostRepository(session)
+
+                service = AuthorService(author_repository, post_repository, like_repository)
 
                 # await service.on_user_created(user)
                 await session.commit()
