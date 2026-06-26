@@ -72,3 +72,7 @@ export interface ApiPost {
   author_id: string;
   created_at: string;
 }
+
+export interface LikeProfileResponse {
+  liked: boolean;
+}

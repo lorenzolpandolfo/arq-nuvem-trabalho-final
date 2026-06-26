@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Heart, Pencil, RefreshCw } from "lucide-react";
 
 import type { UserData, AuthorPost, AuthorDataResponse } from "../types";
 import { BRAND_GRADIENT } from "../lib/constants";
 import { timeAgo } from "../lib/utils";
-import { fetchAuthorById, fetchPostsByAuthor } from "../lib/api";
+import { fetchAuthorById, fetchPostsByAuthor, likeProfile } from "../lib/api";
 import { AvatarRing } from "../components/AvatarRing";
 import { EditProfileModal } from "../components/EditProfileModal";
 
@@ -24,38 +24,29 @@ export function ProfileScreen({ onSaveProfile }: Props) {
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [user, setUser] = useState<AuthorDataResponse | null>(null);
 
-  useEffect(() => {
+  const loadAuthorData = useCallback(async () => {
     if (!userId) return;
-
-    let cancelled = false;
 
     setLoadingPosts(true);
 
-    fetchPostsByAuthor(userId)
-      .then((response) => {
-        if (!cancelled) {
-          setPosts(response.posts);
-        }
-      })
-      .catch((err) => console.error("Erro ao carregar posts:", err))
-      .finally(() => {
-        if (!cancelled) {
-          setLoadingPosts(false);
-        }
-      });
+    try {
+      const [postsResponse, authorResponse] = await Promise.all([
+        fetchPostsByAuthor(userId),
+        fetchAuthorById(userId),
+      ]);
 
-    fetchAuthorById(userId)
-      .then((response) => {
-        if (!cancelled) {
-          setUser(response);
-        }
-      })
-      .catch((err) => console.error("Erro ao carregar dados do usuário:", err));
-
-    return () => {
-      cancelled = true;
-    };
+      setPosts(postsResponse.posts);
+      setUser(authorResponse);
+    } catch (err) {
+      console.error("Erro ao carregar perfil:", err);
+    } finally {
+      setLoadingPosts(false);
+    }
   }, [userId]);
+
+  useEffect(() => {
+    loadAuthorData();
+  }, [loadAuthorData]);
 
   const handleSave = (name: string, bio: string, avatar: string) => {
     if (!user) return;
@@ -71,6 +62,17 @@ export function ProfileScreen({ onSaveProfile }: Props) {
     setUser(updated);
     setShowEdit(false);
   };
+
+  async function handleLikeProfile() {
+    if (!userId) return;
+
+    try {
+      await likeProfile(userId);
+      await loadAuthorData();
+    } catch (err) {
+      console.error("Erro ao curtir perfil:", err);
+    }
+  }
 
   return (
     <>
@@ -140,8 +142,21 @@ export function ProfileScreen({ onSaveProfile }: Props) {
             <Pencil size={15} />
             Editar perfil
           </button>
+        ) : user?.has_like ? (
+          <button
+            onClick={handleLikeProfile}
+            className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.97]"
+            style={{
+              background: BRAND_GRADIENT,
+              color: "white",
+            }}
+          >
+            <Heart size={16} fill="white" />
+            Remover curtida
+          </button>
         ) : (
           <button
+            onClick={handleLikeProfile}
             className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.97]"
             style={{
               background: BRAND_GRADIENT,

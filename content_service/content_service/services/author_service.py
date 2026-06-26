@@ -83,11 +83,14 @@ class AuthorService:
 
         has_like = False
 
+
         if current_user_id is not None:
             has_like = await self.like_repository.has_like(
                 from_user_id=current_user_id,
                 to_user_id=author_id,
             )
+
+        logging.warning("[author-service] Usuario id %s contem like no usuario id %s ? %s", current_user_id, author_id, has_like)
 
         return AuthorMetricsResponse(
             name=author.name,

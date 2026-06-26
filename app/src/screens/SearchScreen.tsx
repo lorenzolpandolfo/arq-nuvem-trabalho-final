@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { Search, Heart } from "lucide-react";
 import type { UserData } from "../types";
-import { getProfileLikeCount, isProfileLiked } from "../lib/api";
 import { AvatarRing } from "../components/AvatarRing";
 
 interface Props {
@@ -45,8 +44,8 @@ export function SearchScreen({ authors, onOpenProfile }: Props) {
           </div>
         ) : (
           results.map((user) => {
-            const liked = isProfileLiked(user.id);
-            const count = getProfileLikeCount(user);
+            const liked = 0;
+            const count = 0;
             return (
               <button
                 key={user.id}
