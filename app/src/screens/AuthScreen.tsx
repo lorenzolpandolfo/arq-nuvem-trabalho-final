@@ -45,7 +45,7 @@ export function AuthScreen({ onLogin }: Props) {
         : await register(form.name.trim(), form.email.trim(), form.password);
 
       const user = localStorage.getItem("userId");
-      console.log("user definido: ", user);
+      // console.log("user definido: ", user);
       onLogin(user);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
