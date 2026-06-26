@@ -15,6 +15,7 @@ export function EditProfileModal({ user, onSave, onClose }: Props) {
   const [name, setName] = useState(user.name);
   const [bio, setBio] = useState(user.bio ?? "");
   const [avatar, setAvatar] = useState(user.image_url);
+  const [avatarUrlInput, setAvatarUrlInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -29,6 +30,12 @@ export function EditProfileModal({ user, onSave, onClose }: Props) {
       const dataUrl = await readFileAsDataURL(file);
       setAvatar(dataUrl);
     } catch {}
+  };
+
+  const applyAvatarUrl = () => {
+    if (!avatarUrlInput.trim()) return;
+    setAvatar(avatarUrlInput.trim());
+    setAvatarUrlInput("");
   };
 
   const handleSave = async () => {
@@ -125,6 +132,35 @@ export function EditProfileModal({ user, onSave, onClose }: Props) {
           >
             Alterar foto
           </button>
+
+          <div className="w-full flex flex-col items-center justify-center gap-2">
+            <div className="w-full relative">
+              <input
+                value={avatarUrlInput}
+                onChange={(e) => setAvatarUrlInput(e.target.value)}
+                placeholder="Link da imagem"
+                className="w-full bg-secondary border border-border rounded-xl pl-4 pr-10 py-2 text-sm text-foreground focus:outline-none"
+              />
+
+              {avatarUrlInput.length > 0 && (
+                <button
+                  onClick={() => setAvatarUrlInput("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            <button
+              onClick={applyAvatarUrl}
+              disabled={!avatarUrlInput.trim()}
+              className="w-30 py-2 rounded-xl text-sm font-bold text-white disabled:opacity-40 transition-opacity"
+              style={{ background: BRAND_GRADIENT }}
+            >
+              Confirmar
+            </button>
+          </div>
         </div>
 
         <div className="space-y-4">

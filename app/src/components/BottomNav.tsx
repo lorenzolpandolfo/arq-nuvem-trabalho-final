@@ -1,26 +1,27 @@
-import { Home, Search, User } from "lucide-react";
-import type { Screen } from "../types";
+import { Home, LogIn, Search, User } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { BRAND_GRADIENT, SHELL_MAX_WIDTH } from "../lib/constants";
+import type { Screen } from "../types";
 
 interface NavItem {
   id: Screen;
   icon: React.ElementType;
-  label: string;
-  action?: () => void;
 }
 
-interface Props {
-  screen: Screen;
-  isViewingOwnProfile: boolean;
-  onNavigate: (screen: Screen) => void;
-  onProfilePress: () => void;
-}
+export function BottomNav() {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-export function BottomNav({ screen, isViewingOwnProfile, onNavigate, onProfilePress }: Props) {
+  const activeScreen: Screen = location.pathname.startsWith("/search")
+    ? "search"
+    : location.pathname.startsWith("/u")
+      ? "profile"
+      : "feed";
+
   const items: NavItem[] = [
-    { id: "feed", icon: Home, label: "Feed" },
-    { id: "search", icon: Search, label: "Buscar" },
-    { id: "profile", icon: User, label: "Perfil", action: onProfilePress },
+    { id: "feed", icon: Home },
+    { id: "search", icon: Search },
+    { id: "profile", icon: localStorage.getItem("userId") ? User : LogIn },
   ];
 
   return (
@@ -29,21 +30,34 @@ export function BottomNav({ screen, isViewingOwnProfile, onNavigate, onProfilePr
       style={{ width: `min(${SHELL_MAX_WIDTH}px, 100vw)` }}
     >
       <div className="flex items-center">
-        {items.map(({ id, icon: Icon, label, action }) => {
-          const isActive =
-            screen === id && (id !== "profile" || isViewingOwnProfile);
+        {items.map(({ id, icon: Icon }) => {
+          const isActive = activeScreen === id;
+
           return (
             <button
               key={id}
-              onClick={action ?? (() => onNavigate(id))}
+              onClick={() => {
+                if (id === "feed") navigate("/feed");
+                if (id === "search") navigate("/search");
+                if (id === "profile") {
+                  const userId = localStorage.getItem("userId");
+                  if (userId) {
+                    navigate(`/u/${userId}`);
+                  } else {
+                    navigate("/");
+                  }
+                }
+              }}
               className="flex-1 flex flex-col items-center gap-1 py-3 transition-colors"
             >
               <div className="relative">
                 <Icon
                   size={22}
-                  className={isActive ? "text-pink-500" : "text-muted-foreground"}
+                  className={
+                    isActive ? "text-pink-500" : "text-muted-foreground"
+                  }
                   fill={isActive ? "currentColor" : "none"}
-                  strokeWidth={isActive ? 0 : 1.8}
+                  strokeWidth={isActive ? 0 : 1.4}
                 />
                 {isActive && (
                   <div
@@ -52,13 +66,6 @@ export function BottomNav({ screen, isViewingOwnProfile, onNavigate, onProfilePr
                   />
                 )}
               </div>
-              <span
-                className={`text-[10px] font-semibold transition-colors ${
-                  isActive ? "text-pink-500" : "text-muted-foreground"
-                }`}
-              >
-                {label}
-              </span>
             </button>
           );
         })}

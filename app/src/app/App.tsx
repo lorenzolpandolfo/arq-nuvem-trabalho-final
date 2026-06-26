@@ -3,9 +3,10 @@ import {
   Navigate,
   Route,
   Routes,
+  useLocation,
   useNavigate,
 } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { UserData } from "../types";
 import { FONT_FAMILY, SHELL_MAX_WIDTH } from "../lib/constants";
@@ -38,6 +39,17 @@ function AppContent() {
   };
 
   const handleSaveProfile = (updated: UserData) => {};
+
+  const location = useLocation();
+  const hideBottomNav = location.pathname === "/";
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      navigate("/feed");
+    }
+  }, []);
 
   return (
     <div
@@ -77,16 +89,18 @@ function AppContent() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
 
-        <BottomNav
-          onNavigate={(screen) => {
-            if (screen === "feed") navigate("/feed");
-            if (screen === "search") navigate("/search");
-            if (screen === "profile") {
-              const id = localStorage.getItem("userId");
-              if (id) navigate(`/u/${id}`);
-            }
-          }}
-        />
+        {!hideBottomNav && (
+          <BottomNav
+            onNavigate={(screen) => {
+              if (screen === "feed") navigate("/feed");
+              if (screen === "search") navigate("/search");
+              if (screen === "profile") {
+                const id = localStorage.getItem("userId");
+                if (id) navigate(`/u/${id}`);
+              }
+            }}
+          />
+        )}
 
         {showCompose && (
           <ComposeModal

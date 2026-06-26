@@ -50,13 +50,15 @@ export function FeedScreen({
         >
           Lumio
         </span>
-        <button
-          onClick={onLogout}
-          className="text-muted-foreground hover:text-foreground transition-colors p-1"
-          title="Sair"
-        >
-          <LogOut size={18} />
-        </button>
+        {localStorage.getItem("userId") && (
+          <button
+            onClick={onLogout}
+            className="text-muted-foreground hover:text-foreground transition-colors p-1"
+            title="Sair"
+          >
+            <LogOut size={18} />
+          </button>
+        )}
       </div>
 
       {/* Loading state */}
@@ -118,18 +120,20 @@ export function FeedScreen({
       )}
 
       {/* FAB */}
-      <button
-        onClick={onOpenCompose}
-        className="fixed z-30 flex items-center justify-center w-14 h-14 rounded-full shadow-lg shadow-black/40 transition-transform hover:scale-105 active:scale-95"
-        style={{
-          background: BRAND_GRADIENT,
-          bottom: "calc(4.5rem + 16px)",
-          right: `max(16px, calc(50vw - ${SHELL_MAX_WIDTH / 2}px + 16px))`,
-        }}
-        title="Nova publicação"
-      >
-        <Plus size={26} className="text-white" strokeWidth={2.5} />
-      </button>
+      {localStorage.getItem("userId") && (
+        <button
+          onClick={onOpenCompose}
+          className="fixed z-30 flex items-center justify-center w-14 h-14 rounded-full shadow-lg shadow-black/40 transition-transform hover:scale-105 active:scale-95"
+          style={{
+            background: BRAND_GRADIENT,
+            bottom: "calc(4.5rem + 16px)",
+            right: `max(16px, calc(50vw - ${SHELL_MAX_WIDTH / 2}px + 16px))`,
+          }}
+          title="Nova publicação"
+        >
+          <Plus size={26} className="text-white" strokeWidth={2.5} />
+        </button>
+      )}
     </>
   );
 }
