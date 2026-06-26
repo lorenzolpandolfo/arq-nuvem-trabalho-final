@@ -1,13 +1,8 @@
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
-import type { AuthMode, AuthForm } from "../types";
+import type { AuthMode, AuthForm, UserData } from "../types";
 import { BRAND_GRADIENT } from "../lib/constants";
-import {
-  findUserByCredentials,
-  findUserByEmail,
-  registerUser,
-} from "../lib/api";
-import type { UserData } from "../types";
+import { login, register } from "../lib/api";
 
 interface Props {
   onLogin: (user: UserData) => void;
@@ -21,40 +16,49 @@ export function AuthScreen({ onLogin }: Props) {
     password: "",
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const setField =
-    (field: keyof AuthForm) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    (field: keyof AuthForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
       setForm((f) => ({ ...f, [field]: e.target.value }));
-    };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setError("");
+    if (loading) return;
 
-    if (mode === "login") {
-      const user = findUserByCredentials(form.email, form.password);
-      if (!user) {
-        setError("E-mail ou senha incorretos.");
+    if (mode === "register") {
+      if (!form.name.trim() || !form.email.trim() || !form.password) {
+        setError("Preencha todos os campos.");
         return;
       }
+    } else {
+      if (!form.email.trim() || !form.password) {
+        setError("Preencha e-mail e senha.");
+        return;
+      }
+    }
+
+    setLoading(true);
+    try {
+      const user =
+        mode === "login"
+          ? await login(form.email.trim(), form.password)
+          : await register(form.name.trim(), form.email.trim(), form.password);
       onLogin(user);
-      return;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("400") || msg.includes("422")) {
+        setError(
+          mode === "login"
+            ? "E-mail ou senha incorretos."
+            : "Dados inválidos. Verifique os campos.",
+        );
+      } else {
+        setError("Não foi possível conectar ao servidor.");
+      }
+    } finally {
+      setLoading(false);
     }
-
-    if (!form.name.trim() || !form.email.trim() || !form.password) {
-      setError("Preencha todos os campos.");
-      return;
-    }
-    if (findUserByEmail(form.email)) {
-      setError("Este e-mail já está cadastrado.");
-      return;
-    }
-
-    const newUser = registerUser(
-      form.name.trim(),
-      form.email.trim(),
-      form.password,
-    );
-    onLogin(newUser);
   };
 
   const switchMode = (next: AuthMode) => {
@@ -149,23 +153,16 @@ export function AuthScreen({ onLogin }: Props) {
 
           <button
             onClick={handleSubmit}
-            className="w-full py-3.5 rounded-xl font-bold text-white text-sm hover:opacity-90 active:scale-[0.98] transition-all"
+            disabled={loading}
+            className="w-full py-3.5 rounded-xl font-bold text-white text-sm hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60"
             style={{ background: BRAND_GRADIENT }}
           >
-            {mode === "login" ? "Entrar" : "Criar conta"}
+            {loading
+              ? "Aguarde..."
+              : mode === "login"
+                ? "Entrar"
+                : "Criar conta"}
           </button>
-
-          {mode === "login" && (
-            <div className="bg-secondary/60 rounded-xl p-3 text-center">
-              <p className="text-xs text-muted-foreground">
-                Conta de teste:{" "}
-                <span className="text-foreground font-medium">
-                  ana@example.com
-                </span>{" "}
-                · <span className="text-foreground font-medium">123456</span>
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </div>

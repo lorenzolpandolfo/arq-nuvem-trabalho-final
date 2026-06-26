@@ -1,18 +1,21 @@
-import { LogOut, Plus } from "lucide-react";
+import { LogOut, Plus, RefreshCw } from "lucide-react";
 import type { Post, UserData } from "../types";
 import { BRAND_GRADIENT, SHELL_MAX_WIDTH } from "../lib/constants";
 import { timeAgo } from "../lib/utils";
-import { getUserById } from "../lib/api";
 import { AvatarRing } from "../components/AvatarRing";
 
 interface Props {
   posts: Post[];
+  authors: UserData[];
+  loading: boolean;
   onOpenProfile: (user: UserData) => void;
   onOpenCompose: () => void;
   onLogout: () => void;
 }
 
-export function FeedScreen({ posts, onOpenProfile, onOpenCompose, onLogout }: Props) {
+export function FeedScreen({ posts, authors, loading, onOpenProfile, onOpenCompose, onLogout }: Props) {
+  const authorsMap = new Map(authors.map((a) => [a.id, a]));
+
   return (
     <>
       {/* Header */}
@@ -32,42 +35,59 @@ export function FeedScreen({ posts, onOpenProfile, onOpenCompose, onLogout }: Pr
         </button>
       </div>
 
+      {/* Loading state */}
+      {loading && (
+        <div className="flex items-center justify-center py-16 gap-3 text-muted-foreground text-sm">
+          <RefreshCw size={16} className="animate-spin" />
+          Carregando...
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loading && posts.length === 0 && (
+        <div className="py-20 text-center text-muted-foreground text-sm">
+          Nenhuma publicação ainda
+        </div>
+      )}
+
       {/* Posts */}
-      <div>
-        {posts.map((post) => {
-          const author = getUserById(post.userId);
-          if (!author) return null;
-          return (
-            <article
-              key={post.id}
-              className="px-4 py-4 border-b border-border hover:bg-white/[0.02] transition-colors"
-            >
-              <div className="flex gap-3">
-                <button
-                  onClick={() => onOpenProfile(author)}
-                  className="flex-shrink-0 mt-0.5"
-                >
-                  <AvatarRing src={author.avatar} alt={author.name} size={40} />
-                </button>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-1.5 mb-1.5">
-                    <button
-                      onClick={() => onOpenProfile(author)}
-                      className="font-bold text-sm text-foreground hover:underline underline-offset-2 leading-none"
-                    >
-                      {author.name}
-                    </button>
-                    <span className="text-muted-foreground text-xs">
-                      · {timeAgo(post.createdAt)}
-                    </span>
+      {!loading && (
+        <div>
+          {posts.map((post) => {
+            const author = authorsMap.get(post.userId);
+            if (!author) return null;
+            return (
+              <article
+                key={post.id}
+                className="px-4 py-4 border-b border-border hover:bg-white/[0.02] transition-colors"
+              >
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => onOpenProfile(author)}
+                    className="flex-shrink-0 mt-0.5"
+                  >
+                    <AvatarRing src={author.avatar} alt={author.name} size={40} />
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-1.5 mb-1.5">
+                      <button
+                        onClick={() => onOpenProfile(author)}
+                        className="font-bold text-sm text-foreground hover:underline underline-offset-2 leading-none"
+                      >
+                        {author.name}
+                      </button>
+                      <span className="text-muted-foreground text-xs">
+                        · {timeAgo(post.createdAt)}
+                      </span>
+                    </div>
+                    <p className="text-foreground/90 text-sm leading-relaxed">{post.text}</p>
                   </div>
-                  <p className="text-foreground/90 text-sm leading-relaxed">{post.text}</p>
                 </div>
-              </div>
-            </article>
-          );
-        })}
-      </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
 
       {/* FAB */}
       <button

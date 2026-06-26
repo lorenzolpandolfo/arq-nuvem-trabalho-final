@@ -1,17 +1,21 @@
 import { useMemo, useState } from "react";
 import { Search, Heart } from "lucide-react";
 import type { UserData } from "../types";
-import { searchUsers, getProfileLikeCount, isProfileLiked } from "../lib/api";
+import { getProfileLikeCount, isProfileLiked } from "../lib/api";
 import { AvatarRing } from "../components/AvatarRing";
 
 interface Props {
+  authors: UserData[];
   onOpenProfile: (user: UserData) => void;
 }
 
-export function SearchScreen({ onOpenProfile }: Props) {
+export function SearchScreen({ authors, onOpenProfile }: Props) {
   const [query, setQuery] = useState("");
 
-  const results = useMemo(() => searchUsers(query), [query]);
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return q ? authors.filter((u) => u.name.toLowerCase().includes(q)) : authors;
+  }, [authors, query]);
 
   return (
     <>
@@ -40,7 +44,7 @@ export function SearchScreen({ onOpenProfile }: Props) {
         ) : (
           results.map((user) => {
             const liked = isProfileLiked(user.id);
-            const count = getProfileLikeCount(user.id);
+            const count = getProfileLikeCount(user);
             return (
               <button
                 key={user.id}

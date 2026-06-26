@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ArrowLeft, Heart, Pencil } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Heart, Pencil, RefreshCw } from "lucide-react";
 import type { UserData, Post } from "../types";
 import { BRAND_GRADIENT } from "../lib/constants";
 import { timeAgo } from "../lib/utils";
@@ -7,7 +7,7 @@ import {
   getProfileLikeCount,
   isProfileLiked,
   toggleProfileLike,
-  getPostsByUser,
+  fetchPostsByAuthor,
 } from "../lib/api";
 import { AvatarRing } from "../components/AvatarRing";
 import { EditProfileModal } from "../components/EditProfileModal";
@@ -16,25 +16,37 @@ interface Props {
   user: UserData;
   currentUserId: string;
   onBack: () => void;
-  onSaveProfile: (name: string, bio: string, avatar: string) => void;
+  onSaveProfile: (updated: UserData) => void;
 }
 
 export function ProfileScreen({ user, currentUserId, onBack, onSaveProfile }: Props) {
   const isOwn = user.id === currentUserId;
-  const [liked, setLiked] = useState(isProfileLiked(user.id));
-  const [likeCount, setLikeCount] = useState(getProfileLikeCount(user.id));
-  const [showEdit, setShowEdit] = useState(false);
 
-  const posts: Post[] = getPostsByUser(user.id);
+  const [liked, setLiked] = useState(isProfileLiked(user.id));
+  const [likeCount, setLikeCount] = useState(getProfileLikeCount(user));
+  const [showEdit, setShowEdit] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoadingPosts(true);
+    fetchPostsByAuthor(user.id)
+      .then((fetched) => { if (!cancelled) setPosts(fetched); })
+      .catch((err) => console.error("Erro ao carregar posts:", err))
+      .finally(() => { if (!cancelled) setLoadingPosts(false); });
+    return () => { cancelled = true; };
+  }, [user.id]);
 
   const handleToggleLike = () => {
     const result = toggleProfileLike(user.id);
     setLiked(result.liked);
-    setLikeCount(result.count);
+    setLikeCount(getProfileLikeCount(user));
   };
 
   const handleSave = (name: string, bio: string, avatar: string) => {
-    onSaveProfile(name, bio, avatar);
+    const updated: UserData = { ...user, name, bio, avatar };
+    onSaveProfile(updated);
     setShowEdit(false);
   };
 
@@ -110,7 +122,12 @@ export function ProfileScreen({ user, currentUserId, onBack, onSaveProfile }: Pr
       <div className="border-t border-border" />
 
       {/* Posts */}
-      {posts.length === 0 ? (
+      {loadingPosts ? (
+        <div className="flex items-center justify-center py-12 gap-2 text-muted-foreground text-sm">
+          <RefreshCw size={15} className="animate-spin" />
+          Carregando posts...
+        </div>
+      ) : posts.length === 0 ? (
         <div className="py-20 text-center text-muted-foreground text-sm">
           Nenhuma postagem ainda
         </div>

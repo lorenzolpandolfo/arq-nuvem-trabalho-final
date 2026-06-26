@@ -1,7 +1,12 @@
-import { useState, useMemo } from "react";
-import type { Screen, UserData } from "../types";
+import { useState, useEffect, useCallback } from "react";
+import type { Screen, UserData, Post } from "../types";
 import { FONT_FAMILY, SHELL_MAX_WIDTH } from "../lib/constants";
-import { getPosts, createPost, updateUser, getUserById } from "../lib/api";
+import {
+  clearToken,
+  fetchPosts,
+  fetchAuthors,
+  createPost,
+} from "../lib/api";
 
 import { AuthScreen } from "../screens/AuthScreen";
 import { FeedScreen } from "../screens/FeedScreen";
@@ -15,9 +20,32 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<UserData | null>(null);
   const [viewingUser, setViewingUser] = useState<UserData | null>(null);
   const [showCompose, setShowCompose] = useState(false);
-  const [postVersion, setPostVersion] = useState(0); // triggers feed re-render on new post
 
-  const posts = useMemo(() => getPosts(), [postVersion]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Global data loaded once after login
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [authors, setAuthors] = useState<UserData[]>([]);
+  const [loadingFeed, setLoadingFeed] = useState(false);
+
+  const loadFeedData = useCallback(async () => {
+    setLoadingFeed(true);
+    try {
+      const [fetchedPosts, fetchedAuthors] = await Promise.all([
+        fetchPosts(),
+        fetchAuthors(),
+      ]);
+      setPosts(fetchedPosts);
+      setAuthors(fetchedAuthors);
+    } catch (err) {
+      console.error("Erro ao carregar feed:", err);
+    } finally {
+      setLoadingFeed(false);
+    }
+  }, []);
+
+  // Load data whenever the user logs in
+  useEffect(() => {
+    if (currentUser) loadFeedData();
+  }, [currentUser, loadFeedData]);
 
   const handleLogin = (user: UserData) => {
     setCurrentUser(user);
@@ -25,28 +53,36 @@ export default function App() {
   };
 
   const handleLogout = () => {
+    clearToken();
     setCurrentUser(null);
+    setPosts([]);
+    setAuthors([]);
     setScreen("auth");
   };
 
   const handleOpenProfile = (user: UserData) => {
-    const fresh = getUserById(user.id) ?? user;
+    // Prefer the freshest copy from the authors list
+    const fresh = authors.find((a) => a.id === user.id) ?? user;
     setViewingUser(fresh);
     setScreen("profile");
   };
 
-  const handleNewPost = (text: string) => {
+  const handleNewPost = async (text: string) => {
     if (!currentUser) return;
-    createPost(currentUser.id, text);
-    setPostVersion((v) => v + 1);
+    try {
+      const post = await createPost(text);
+      setPosts((prev) => [post, ...prev]);
+    } catch (err) {
+      console.error("Erro ao publicar:", err);
+    }
   };
 
-  const handleSaveProfile = (name: string, bio: string, avatar: string) => {
-    if (!currentUser) return;
-    const updated = updateUser(currentUser.id, { name, bio, avatar });
-    if (!updated) return;
+  // Called by ProfileScreen after a successful local edit.
+  // NOTE: a PATCH /api/auth/users/me endpoint would persist this server-side.
+  const handleSaveProfile = (updated: UserData) => {
     setCurrentUser(updated);
-    if (viewingUser?.id === currentUser.id) setViewingUser(updated);
+    setViewingUser(updated);
+    setAuthors((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
   };
 
   if (screen === "auth") {
@@ -69,6 +105,8 @@ export default function App() {
         {screen === "feed" && (
           <FeedScreen
             posts={posts}
+            authors={authors}
+            loading={loadingFeed}
             onOpenProfile={handleOpenProfile}
             onOpenCompose={() => setShowCompose(true)}
             onLogout={handleLogout}
@@ -76,7 +114,10 @@ export default function App() {
         )}
 
         {screen === "search" && (
-          <SearchScreen onOpenProfile={handleOpenProfile} />
+          <SearchScreen
+            authors={authors}
+            onOpenProfile={handleOpenProfile}
+          />
         )}
 
         {screen === "profile" && viewingUser && currentUser && (
