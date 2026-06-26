@@ -7,6 +7,14 @@ Trabalho final da disciplina de Arquitetura de Computação em Núvem do UniSena
 links
 
 
+## Tecnologias utilizadas
+
+- Frontend: Typescript com React
+- Backend: Python com FastAPI
+- API Gateway local: Nginx
+- Monitoramento: Prometheus e Grafana
+- Documentação: OpenAPI
+
 ## Setup
 
 Crie a network do docker para que os serviços se comuniquem com o rabbit:
@@ -85,3 +93,36 @@ Conexões ativas no RabbitMQ - customer-service e content-service:
 <img width="3072" height="1856" alt="image" src="https://github.com/user-attachments/assets/87f4d33d-c0ce-4e4e-8264-fac1b44315c5" />
 
 
+## Exemplos de chamadas
+
+Abaixo seguem exemplos de chamadas utilizando o API Gateway do nginx:
+
+
+Registro (customer-service):
+```
+curl --location 'http://localhost/api/auth/register' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "email": "user4@example.com",
+  "password": "string",
+  "is_active": true,
+  "is_superuser": false,
+  "is_verified": false,
+  "image_url": "foo.png",
+  "bio": "salveee",
+  "name": "Lorenzo"
+}'
+```
+
+Retornar dados do usuário autenticado (content-service):
+```
+curl --location 'http://localhost/api/users/me' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZTY5N2FmZS1lM2MyLTRlZGUtYmQyZS0wOTZkM2VjZGFmZDgiLCJhdWQiOlsiZmFzdGFwaS11c2VyczphdXRoIl19.v4u0-WcjSQezJ-NZKLRvvHEqF7VbB5BiMtpG2q1MRNY'
+```
+
+
+Retornar posts do feed (content-service):
+
+```
+curl --location 'http://localhost/api/content/posts'
+```

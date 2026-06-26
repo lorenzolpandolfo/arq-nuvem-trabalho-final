@@ -2,7 +2,11 @@ import { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import type { AuthMode, AuthForm } from "../types";
 import { BRAND_GRADIENT } from "../lib/constants";
-import { findUserByCredentials, findUserByEmail, registerUser } from "../lib/api";
+import {
+  findUserByCredentials,
+  findUserByEmail,
+  registerUser,
+} from "../lib/api";
 import type { UserData } from "../types";
 
 interface Props {
@@ -11,31 +15,45 @@ interface Props {
 
 export function AuthScreen({ onLogin }: Props) {
   const [mode, setMode] = useState<AuthMode>("login");
-  const [form, setForm] = useState<AuthForm>({ name: "", email: "", password: "" });
+  const [form, setForm] = useState<AuthForm>({
+    name: "",
+    email: "",
+    password: "",
+  });
   const [error, setError] = useState("");
 
-  const setField = (field: keyof AuthForm) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((f) => ({ ...f, [field]: e.target.value }));
-  };
+  const setField =
+    (field: keyof AuthForm) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setForm((f) => ({ ...f, [field]: e.target.value }));
+    };
 
   const handleSubmit = () => {
     setError("");
 
     if (mode === "login") {
       const user = findUserByCredentials(form.email, form.password);
-      if (!user) { setError("E-mail ou senha incorretos."); return; }
+      if (!user) {
+        setError("E-mail ou senha incorretos.");
+        return;
+      }
       onLogin(user);
       return;
     }
 
     if (!form.name.trim() || !form.email.trim() || !form.password) {
-      setError("Preencha todos os campos."); return;
+      setError("Preencha todos os campos.");
+      return;
     }
     if (findUserByEmail(form.email)) {
-      setError("Este e-mail já está cadastrado."); return;
+      setError("Este e-mail já está cadastrado.");
+      return;
     }
 
-    const newUser = registerUser(form.name.trim(), form.email.trim(), form.password);
+    const newUser = registerUser(
+      form.name.trim(),
+      form.email.trim(),
+      form.password,
+    );
     onLogin(newUser);
   };
 
@@ -124,7 +142,9 @@ export function AuthScreen({ onLogin }: Props) {
           </Field>
 
           {error && (
-            <p className="text-red-400 text-sm text-center font-medium">{error}</p>
+            <p className="text-red-400 text-sm text-center font-medium">
+              {error}
+            </p>
           )}
 
           <button
@@ -139,9 +159,10 @@ export function AuthScreen({ onLogin }: Props) {
             <div className="bg-secondary/60 rounded-xl p-3 text-center">
               <p className="text-xs text-muted-foreground">
                 Conta de teste:{" "}
-                <span className="text-foreground font-medium">ana@example.com</span>
-                {" "}·{" "}
-                <span className="text-foreground font-medium">123456</span>
+                <span className="text-foreground font-medium">
+                  ana@example.com
+                </span>{" "}
+                · <span className="text-foreground font-medium">123456</span>
               </p>
             </div>
           )}
@@ -154,7 +175,13 @@ export function AuthScreen({ onLogin }: Props) {
 const inputCls =
   "w-full bg-secondary border border-border rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-pink-500/60 focus:ring-1 focus:ring-pink-500/30 transition-all";
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1.5">
       <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-widest">
