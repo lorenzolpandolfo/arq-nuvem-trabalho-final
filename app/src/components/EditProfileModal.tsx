@@ -5,7 +5,7 @@ import { BRAND_GRADIENT, BIO_MAX_LENGTH } from "../lib/constants";
 import { readFileAsDataURL } from "../lib/utils";
 
 interface Props {
-  user: UserData;
+  userId: string;
   onSave: (name: string, bio: string, avatar: string) => void;
   onClose: () => void;
 }
@@ -13,7 +13,7 @@ interface Props {
 export function EditProfileModal({ user, onSave, onClose }: Props) {
   const [name, setName] = useState(user.name);
   const [bio, setBio] = useState(user.bio);
-  const [avatar, setAvatar] = useState(user.avatar);
+  const [avatar, setAvatar] = useState(user.image_url);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const canSave = name.trim().length > 0;
@@ -40,7 +40,10 @@ export function EditProfileModal({ user, onSave, onClose }: Props) {
       className="fixed inset-0 z-50 flex flex-col"
       style={{ maxWidth: 430, margin: "0 auto" }}
     >
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
       <div className="relative mt-auto bg-card rounded-t-3xl border-t border-border px-4 pt-4 pb-8 flex flex-col gap-5">
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-1" />
@@ -67,7 +70,10 @@ export function EditProfileModal({ user, onSave, onClose }: Props) {
         {/* Avatar picker */}
         <div className="flex flex-col items-center gap-2">
           <div className="relative">
-            <div className="p-[2px] rounded-full" style={{ background: BRAND_GRADIENT }}>
+            <div
+              className="p-[2px] rounded-full"
+              style={{ background: BRAND_GRADIENT }}
+            >
               <div className="p-[2px] bg-card rounded-full">
                 <img
                   src={avatar}

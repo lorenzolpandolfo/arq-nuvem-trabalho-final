@@ -40,10 +40,12 @@ export function AuthScreen({ onLogin }: Props) {
 
     setLoading(true);
     try {
-      const user =
-        mode === "login"
-          ? await login(form.email.trim(), form.password)
-          : await register(form.name.trim(), form.email.trim(), form.password);
+      mode === "login"
+        ? await login(form.email.trim(), form.password)
+        : await register(form.name.trim(), form.email.trim(), form.password);
+
+      const user = localStorage.getItem("userId");
+      console.log("user definido: ", user);
       onLogin(user);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);

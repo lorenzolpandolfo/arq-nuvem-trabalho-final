@@ -90,6 +90,9 @@ class AuthorService:
             )
 
         return AuthorMetricsResponse(
+            name=author.name,
+            bio=author.bio,
+            image_url=author.image_url,
             posts=posts,
             likes=likes,
             has_like=has_like,

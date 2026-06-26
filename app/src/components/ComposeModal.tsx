@@ -30,7 +30,10 @@ export function ComposeModal({ user, onPost, onClose }: Props) {
       className="fixed inset-0 z-50 flex flex-col"
       style={{ maxWidth: 430, margin: "0 auto" }}
     >
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
       <div className="relative mt-auto bg-card rounded-t-3xl border-t border-border px-4 pt-4 pb-8 flex flex-col gap-4">
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-1" />
@@ -55,7 +58,7 @@ export function ComposeModal({ user, onPost, onClose }: Props) {
         </div>
 
         <div className="flex gap-3">
-          <AvatarRing src={user.avatar} alt={user.name} size={40} />
+          <AvatarRing src={user.image_url} alt={user.name} size={40} />
           <div className="flex-1">
             <p className="text-sm font-bold mb-2">{user.name}</p>
             <textarea
@@ -76,23 +79,33 @@ export function ComposeModal({ user, onPost, onClose }: Props) {
               remaining < 0
                 ? "text-red-400"
                 : remaining < 20
-                ? "text-yellow-400"
-                : "text-muted-foreground"
+                  ? "text-yellow-400"
+                  : "text-muted-foreground"
             }`}
           >
             {remaining}
           </span>
           <svg width={24} height={24} className="-rotate-90">
             <circle
-              cx={12} cy={12} r={10}
+              cx={12}
+              cy={12}
+              r={10}
               fill="none"
               stroke="rgba(255,255,255,0.08)"
               strokeWidth={2}
             />
             <circle
-              cx={12} cy={12} r={10}
+              cx={12}
+              cy={12}
+              r={10}
               fill="none"
-              stroke={remaining < 0 ? "#ef4444" : remaining < 20 ? "#facc15" : "#c13584"}
+              stroke={
+                remaining < 0
+                  ? "#ef4444"
+                  : remaining < 20
+                    ? "#facc15"
+                    : "#c13584"
+              }
               strokeWidth={2}
               strokeDasharray={circumference}
               strokeDashoffset={circumference * (1 - progress)}

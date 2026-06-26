@@ -1,22 +1,48 @@
 export type Screen = "auth" | "feed" | "profile" | "search";
 export type AuthMode = "login" | "register";
 
-/** Shape used throughout the UI */
 export interface UserData {
   id: string;
   name: string;
   email: string;
-  avatar: string;
+  image_url: string;
   bio: string;
   baseLikes: number;
 }
 
-/** Shape used throughout the UI */
 export interface Post {
   id: string;
-  userId: string;
-  text: string;
-  createdAt: Date;
+  author_id: string;
+  author_image_url: string;
+  author_name: string;
+  description: string;
+  created_date: string;
+}
+
+export interface AuthorPost {
+  id: string;
+  author: string;
+  author_image_url: string;
+  description: string;
+  created_at: string;
+}
+
+export interface PostResponse {
+  posts: Post[];
+}
+
+export interface AuthorPostsResponse {
+  posts: AuthorPost[];
+}
+
+export interface AuthorDataResponse {
+  id: string;
+  name: string;
+  bio: string;
+  image_url: string;
+  posts: number;
+  likes: number;
+  has_like: boolean;
 }
 
 export interface AuthForm {

@@ -14,7 +14,9 @@ export function SearchScreen({ authors, onOpenProfile }: Props) {
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return q ? authors.filter((u) => u.name.toLowerCase().includes(q)) : authors;
+    return q
+      ? authors.filter((u) => u.name.toLowerCase().includes(q))
+      : authors;
   }, [authors, query]);
 
   return (
@@ -51,17 +53,23 @@ export function SearchScreen({ authors, onOpenProfile }: Props) {
                 onClick={() => onOpenProfile(user)}
                 className="w-full px-4 py-3.5 flex items-center gap-3 border-b border-border hover:bg-white/[0.03] transition-colors text-left"
               >
-                <AvatarRing src={user.avatar} alt={user.name} size={48} />
+                <AvatarRing src={user.image_url} alt={user.name} size={48} />
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm text-foreground truncate">{user.name}</p>
+                  <p className="font-bold text-sm text-foreground truncate">
+                    {user.name}
+                  </p>
                   {user.bio && (
-                    <p className="text-muted-foreground text-xs mt-0.5 truncate">{user.bio}</p>
+                    <p className="text-muted-foreground text-xs mt-0.5 truncate">
+                      {user.bio}
+                    </p>
                   )}
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <Heart
                     size={13}
-                    className={liked ? "text-pink-500" : "text-muted-foreground"}
+                    className={
+                      liked ? "text-pink-500" : "text-muted-foreground"
+                    }
                     fill={liked ? "currentColor" : "none"}
                   />
                   <span className="text-xs text-muted-foreground">{count}</span>

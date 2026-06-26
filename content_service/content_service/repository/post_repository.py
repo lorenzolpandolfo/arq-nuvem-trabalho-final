@@ -61,6 +61,7 @@ class PostRepository(AbstractRepository[PostModel]):
             select(
                 AuthorModel.name.label("author"),
                 AuthorModel.image_url,
+                PostModel.id,
                 PostModel.description,
                 PostModel.created_date.label("created_at"),
             )

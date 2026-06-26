@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class PostResponse(BaseModel):
+    id: UUID
     author_id: UUID
     author_name: str
     author_image_url: str | None

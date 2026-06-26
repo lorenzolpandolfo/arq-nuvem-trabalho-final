@@ -3,6 +3,8 @@ import type { Post, UserData } from "../types";
 import { BRAND_GRADIENT, SHELL_MAX_WIDTH } from "../lib/constants";
 import { timeAgo } from "../lib/utils";
 import { AvatarRing } from "../components/AvatarRing";
+import { useCallback, useEffect, useState } from "react";
+import { fetchPosts } from "../lib/api";
 
 interface Props {
   posts: Post[];
@@ -13,8 +15,30 @@ interface Props {
   onLogout: () => void;
 }
 
-export function FeedScreen({ posts, authors, loading, onOpenProfile, onOpenCompose, onLogout }: Props) {
-  const authorsMap = new Map(authors.map((a) => [a.id, a]));
+export function FeedScreen({
+  loading,
+  onOpenProfile,
+  onOpenCompose,
+  onLogout,
+}: Props) {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loadingFeed, setLoadingFeed] = useState(false);
+
+  const loadFeedData = useCallback(async () => {
+    setLoadingFeed(true);
+    try {
+      const fetchedPosts = await fetchPosts();
+      setPosts(fetchedPosts);
+    } catch (err) {
+      console.error("Erro ao carregar feed:", err);
+    } finally {
+      setLoadingFeed(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadFeedData();
+  }, []);
 
   return (
     <>
@@ -54,8 +78,6 @@ export function FeedScreen({ posts, authors, loading, onOpenProfile, onOpenCompo
       {!loading && (
         <div>
           {posts.map((post) => {
-            const author = authorsMap.get(post.userId);
-            if (!author) return null;
             return (
               <article
                 key={post.id}
@@ -63,24 +85,30 @@ export function FeedScreen({ posts, authors, loading, onOpenProfile, onOpenCompo
               >
                 <div className="flex gap-3">
                   <button
-                    onClick={() => onOpenProfile(author)}
+                    onClick={() => onOpenProfile(post.author_id)}
                     className="flex-shrink-0 mt-0.5"
                   >
-                    <AvatarRing src={author.avatar} alt={author.name} size={40} />
+                    <AvatarRing
+                      src={post.author_image_url}
+                      alt={post.author_name}
+                      size={40}
+                    />
                   </button>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-1.5 mb-1.5">
                       <button
-                        onClick={() => onOpenProfile(author)}
+                        onClick={() => onOpenProfile(post.author_id)}
                         className="font-bold text-sm text-foreground hover:underline underline-offset-2 leading-none"
                       >
-                        {author.name}
+                        {post.author_name}
                       </button>
                       <span className="text-muted-foreground text-xs">
-                        · {timeAgo(post.createdAt)}
+                        · {timeAgo(post.created_date)}
                       </span>
                     </div>
-                    <p className="text-foreground/90 text-sm leading-relaxed">{post.text}</p>
+                    <p className="text-foreground/90 text-sm leading-relaxed">
+                      {post.description}
+                    </p>
                   </div>
                 </div>
               </article>
