@@ -51,15 +51,8 @@ export function ProfileScreen({ onSaveProfile }: Props) {
   const handleSave = (name: string, bio: string, avatar: string) => {
     if (!user) return;
 
-    const updated: UserData = {
-      ...user,
-      name,
-      bio,
-      image_url: avatar,
-    };
+    loadAuthorData();
 
-    onSaveProfile(updated);
-    setUser(updated);
     setShowEdit(false);
   };
 
@@ -133,11 +126,7 @@ export function ProfileScreen({ onSaveProfile }: Props) {
         ) : user?.has_like ? (
           <button
             onClick={handleLikeProfile}
-            className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.97]"
-            style={{
-              background: BRAND_GRADIENT,
-              color: "white",
-            }}
+            className="border-1 border-white w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.97]"
           >
             <Heart size={16} fill="white" />
             Remover curtida

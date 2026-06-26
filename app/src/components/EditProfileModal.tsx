@@ -1,38 +1,55 @@
 import { useState, useRef } from "react";
 import { X, Check, Camera } from "lucide-react";
-import type { UserData } from "../types";
 import { BRAND_GRADIENT, BIO_MAX_LENGTH } from "../lib/constants";
 import { readFileAsDataURL } from "../lib/utils";
+import type { AuthorDataResponse } from "../types";
+import { updateProfile } from "../lib/api";
 
 interface Props {
-  userId: string;
-  onSave: (name: string, bio: string, avatar: string) => void;
+  user: AuthorDataResponse;
+  onSave: (updated: AuthorDataResponse) => void;
   onClose: () => void;
 }
 
 export function EditProfileModal({ user, onSave, onClose }: Props) {
   const [name, setName] = useState(user.name);
-  const [bio, setBio] = useState(user.bio);
+  const [bio, setBio] = useState(user.bio ?? "");
   const [avatar, setAvatar] = useState(user.image_url);
+  const [loading, setLoading] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const canSave = name.trim().length > 0;
+  const canSave = name.trim().length > 0 && !loading;
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     try {
       const dataUrl = await readFileAsDataURL(file);
       setAvatar(dataUrl);
-    } catch {
-      // silently keep previous avatar
-    }
+    } catch {}
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!canSave) return;
-    onSave(name.trim(), bio.trim(), avatar);
-    onClose();
+
+    setLoading(true);
+
+    try {
+      const updated = await updateProfile({
+        name: name.trim(),
+        bio: bio.trim(),
+        image_url: avatar,
+      });
+
+      onSave(updated);
+      onClose();
+    } catch (err) {
+      console.error("Erro ao atualizar perfil:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -55,7 +72,9 @@ export function EditProfileModal({ user, onSave, onClose }: Props) {
           >
             <X size={20} />
           </button>
+
           <span className="text-sm font-bold">Editar perfil</span>
+
           <button
             onClick={handleSave}
             disabled={!canSave}
@@ -67,7 +86,6 @@ export function EditProfileModal({ user, onSave, onClose }: Props) {
           </button>
         </div>
 
-        {/* Avatar picker */}
         <div className="flex flex-col items-center gap-2">
           <div className="relative">
             <div
@@ -82,6 +100,7 @@ export function EditProfileModal({ user, onSave, onClose }: Props) {
                 />
               </div>
             </div>
+
             <button
               onClick={() => fileInputRef.current?.click()}
               className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center border-2 border-card"
@@ -89,6 +108,7 @@ export function EditProfileModal({ user, onSave, onClose }: Props) {
             >
               <Camera size={13} className="text-white" />
             </button>
+
             <input
               ref={fileInputRef}
               type="file"
@@ -97,41 +117,42 @@ export function EditProfileModal({ user, onSave, onClose }: Props) {
               onChange={handleFileChange}
             />
           </div>
+
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="text-xs font-semibold"
+            className="text-xs font-bold"
             style={{ color: "#dc2743" }}
           >
             Alterar foto
           </button>
         </div>
 
-        {/* Fields */}
         <div className="space-y-4">
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-widest">
               Nome
             </label>
+
             <input
-              type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Seu nome"
-              className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-pink-500/60 focus:ring-1 focus:ring-pink-500/30 transition-all"
+              className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none"
             />
           </div>
+
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-widest">
               Bio
             </label>
+
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="Uma linha sobre você..."
-              rows={3}
               maxLength={BIO_MAX_LENGTH}
-              className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-pink-500/60 focus:ring-1 focus:ring-pink-500/30 transition-all resize-none"
+              rows={3}
+              className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-sm text-foreground resize-none focus:outline-none"
             />
+
             <p className="text-xs text-muted-foreground text-right">
               {bio.length}/{BIO_MAX_LENGTH}
             </p>
