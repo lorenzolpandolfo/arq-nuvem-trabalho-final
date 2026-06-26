@@ -1,29 +1,61 @@
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X, Send } from "lucide-react";
-import type { UserData } from "../types";
+
+import type { AuthorDataResponse, Post } from "../types";
 import { BRAND_GRADIENT, POST_MAX_LENGTH } from "../lib/constants";
+import { fetchAuthorById, createPost } from "../lib/api";
 import { AvatarRing } from "./AvatarRing";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
-  user: UserData;
-  onPost: (text: string) => void;
+  userId: string;
+  onPost: (post: Post) => void;
   onClose: () => void;
 }
 
-export function ComposeModal({ user, onPost, onClose }: Props) {
+export function ComposeModal({ userId, onPost, onClose }: Props) {
   const [text, setText] = useState("");
+  const [user, setUser] = useState<AuthorDataResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchAuthorById(userId)
+      .then((response) => {
+        if (!cancelled) setUser(response);
+      })
+      .catch((err) => console.error(err));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   const remaining = POST_MAX_LENGTH - text.length;
   const canPost = text.trim().length > 0 && remaining >= 0;
   const progress = Math.min(text.length / POST_MAX_LENGTH, 1);
   const circumference = 2 * Math.PI * 10;
 
-  const handleSubmit = () => {
-    if (!canPost) return;
-    onPost(text.trim());
-    onClose();
-  };
+  async function handleSubmit() {
+    if (!canPost || loading) return;
+
+    setLoading(true);
+
+    try {
+      const post = await createPost(text.trim());
+      onPost(post);
+      onClose();
+    } catch (err) {
+      console.error("Erro ao criar post:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (!user) return null;
 
   return (
     <div
@@ -45,10 +77,12 @@ export function ComposeModal({ user, onPost, onClose }: Props) {
           >
             <X size={20} />
           </button>
+
           <span className="text-sm font-bold">Nova publicação</span>
+
           <button
             onClick={handleSubmit}
-            disabled={!canPost}
+            disabled={!canPost || loading}
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-bold text-white disabled:opacity-40 transition-opacity"
             style={{ background: BRAND_GRADIENT }}
           >
@@ -59,8 +93,10 @@ export function ComposeModal({ user, onPost, onClose }: Props) {
 
         <div className="flex gap-3">
           <AvatarRing src={user.image_url} alt={user.name} size={40} />
+
           <div className="flex-1">
             <p className="text-sm font-bold mb-2">{user.name}</p>
+
             <textarea
               ref={textareaRef}
               autoFocus
@@ -85,6 +121,7 @@ export function ComposeModal({ user, onPost, onClose }: Props) {
           >
             {remaining}
           </span>
+
           <svg width={24} height={24} className="-rotate-90">
             <circle
               cx={12}
@@ -94,6 +131,7 @@ export function ComposeModal({ user, onPost, onClose }: Props) {
               stroke="rgba(255,255,255,0.08)"
               strokeWidth={2}
             />
+
             <circle
               cx={12}
               cy={12}

@@ -10,7 +10,6 @@ interface Props {
   posts: Post[];
   authors: UserData[];
   loading: boolean;
-  onOpenProfile: (user: UserData) => void;
   onOpenCompose: () => void;
   onLogout: () => void;
 }
@@ -20,6 +19,7 @@ export function FeedScreen({
   onOpenProfile,
   onOpenCompose,
   onLogout,
+  reloadKey,
 }: Props) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loadingFeed, setLoadingFeed] = useState(false);
@@ -38,7 +38,7 @@ export function FeedScreen({
 
   useEffect(() => {
     loadFeedData();
-  }, []);
+  }, [reloadKey]);
 
   return (
     <>

@@ -21,17 +21,15 @@ import { ComposeModal } from "../components/ComposeModal";
 function AppContent() {
   const navigate = useNavigate();
 
-  const [currentUser, setCurrentUser] = useState<UserData | null>(null);
   const [showCompose, setShowCompose] = useState(false);
+  const [feedReloadKey, setFeedReloadKey] = useState(0);
 
   const handleLogin = (user: UserData) => {
-    setCurrentUser(user);
     navigate("/feed");
   };
 
   const handleLogout = () => {
     clearToken();
-    setCurrentUser(null);
     navigate("/");
   };
 
@@ -39,11 +37,7 @@ function AppContent() {
     navigate(`/u/${userId}`);
   };
 
-  const handleSaveProfile = (updated: UserData) => {
-    setCurrentUser((prev) => (prev && prev.id === updated.id ? updated : prev));
-  };
-
-  const handleNewPost = async () => {};
+  const handleSaveProfile = (updated: UserData) => {};
 
   return (
     <div
@@ -65,6 +59,7 @@ function AppContent() {
                 onOpenProfile={handleOpenProfile}
                 onOpenCompose={() => setShowCompose(true)}
                 onLogout={handleLogout}
+                reloadKey={feedReloadKey}
               />
             }
           />
@@ -93,10 +88,13 @@ function AppContent() {
           }}
         />
 
-        {showCompose && currentUser && (
+        {showCompose && (
           <ComposeModal
-            user={currentUser}
-            onPost={handleNewPost}
+            userId={localStorage.getItem("userId")}
+            onPost={async (post) => {
+              setShowCompose(false);
+              setFeedReloadKey((prev) => prev + 1);
+            }}
             onClose={() => setShowCompose(false)}
           />
         )}
