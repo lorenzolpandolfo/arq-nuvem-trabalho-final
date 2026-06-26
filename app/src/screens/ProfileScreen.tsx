@@ -84,19 +84,7 @@ export function ProfileScreen({ onSaveProfile }: Props) {
           <ArrowLeft size={20} />
         </button>
 
-        <span className="font-bold text-base flex-1 truncate">
-          {user?.name}
-        </span>
-
-        {isOwn && (
-          <button
-            onClick={() => setShowEdit(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-secondary text-foreground hover:bg-secondary/70 transition-colors"
-          >
-            <Pencil size={12} />
-            Editar
-          </button>
-        )}
+        <span className="font-bold text-base flex-1 truncate">Meu perfil</span>
       </div>
 
       <div className="px-4 pt-6 pb-5">
