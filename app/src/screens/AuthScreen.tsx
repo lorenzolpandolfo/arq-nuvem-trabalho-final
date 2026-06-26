@@ -3,6 +3,7 @@ import { MessageCircle } from "lucide-react";
 import type { AuthMode, AuthForm, UserData } from "../types";
 import { BRAND_GRADIENT } from "../lib/constants";
 import { login, register } from "../lib/api";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
   onLogin: (user: UserData) => void;
@@ -45,8 +46,7 @@ export function AuthScreen({ onLogin }: Props) {
         : await register(form.name.trim(), form.email.trim(), form.password);
 
       const user = localStorage.getItem("userId");
-      // console.log("user definido: ", user);
-      onLogin(user);
+      onLogin(user as unknown as UserData);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes("400") || msg.includes("422")) {
@@ -71,16 +71,29 @@ export function AuthScreen({ onLogin }: Props) {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
-      <div className="w-full max-w-sm">
-        {/* Brand */}
-        <div className="text-center mb-12">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="w-full max-w-sm"
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.25 }}
+          className="text-center mb-12"
+        >
           <div className="inline-flex items-center gap-2 mb-3">
-            <div
+            <motion.div
+              initial={{ rotate: -10, scale: 0.9 }}
+              animate={{ rotate: 0, scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
               className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{ background: BRAND_GRADIENT }}
             >
               <MessageCircle size={18} className="text-white" fill="white" />
-            </div>
+            </motion.div>
+
             <span
               className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text"
               style={{ backgroundImage: BRAND_GRADIENT }}
@@ -88,45 +101,60 @@ export function AuthScreen({ onLogin }: Props) {
               Lumio
             </span>
           </div>
+
           <p className="text-muted-foreground text-sm">
             Conecte-se com o mundo ao seu redor
           </p>
-        </div>
+        </motion.div>
 
-        {/* Toggle */}
-        <div className="flex bg-secondary rounded-full p-1 mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex bg-secondary rounded-full p-1 mb-8"
+        >
           {(["login", "register"] as const).map((m) => (
-            <button
+            <motion.button
               key={m}
               onClick={() => switchMode(m)}
-              className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 ${
+              whileTap={{ scale: 0.97 }}
+              className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all ${
                 mode === m
                   ? "bg-white text-black shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground"
               }`}
             >
               {m === "login" ? "Entrar" : "Cadastrar"}
-            </button>
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Fields */}
-        <div className="space-y-4">
-          {mode === "register" && (
-            <Field label="Nome completo">
-              <input
-                type="text"
-                placeholder="Seu nome"
-                value={form.name}
-                onChange={setField("name")}
-                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                className={inputCls}
-              />
-            </Field>
-          )}
+        <motion.div layout className="space-y-4">
+          <AnimatePresence mode="popLayout">
+            {mode === "register" && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Field label="Nome completo">
+                  <input
+                    type="text"
+                    placeholder="Seu nome"
+                    value={form.name}
+                    onChange={setField("name")}
+                    onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                    className={inputCls}
+                  />
+                </Field>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <Field label="E-mail">
-            <input
+            <motion.input
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
               type="email"
               placeholder="seu@email.com"
               value={form.email}
@@ -137,7 +165,9 @@ export function AuthScreen({ onLogin }: Props) {
           </Field>
 
           <Field label="Senha">
-            <input
+            <motion.input
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
               type="password"
               placeholder="••••••••"
               value={form.password}
@@ -147,16 +177,25 @@ export function AuthScreen({ onLogin }: Props) {
             />
           </Field>
 
-          {error && (
-            <p className="text-red-400 text-sm text-center font-medium">
-              {error}
-            </p>
-          )}
+          <AnimatePresence>
+            {error && (
+              <motion.p
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="text-red-400 text-sm text-center font-medium"
+              >
+                {error}
+              </motion.p>
+            )}
+          </AnimatePresence>
 
-          <button
+          <motion.button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full py-3.5 rounded-xl font-bold text-white text-sm hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60"
+            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.01 }}
+            className="w-full py-3.5 rounded-xl font-bold text-white text-sm disabled:opacity-60"
             style={{ background: BRAND_GRADIENT }}
           >
             {loading
@@ -164,9 +203,9 @@ export function AuthScreen({ onLogin }: Props) {
               : mode === "login"
                 ? "Entrar"
                 : "Criar conta"}
-          </button>
-        </div>
-      </div>
+          </motion.button>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

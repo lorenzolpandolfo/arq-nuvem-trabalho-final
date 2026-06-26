@@ -8,6 +8,7 @@ export const BIO_MAX_LENGTH = 120;
 
 export const SHELL_MAX_WIDTH = 430;
 
-export const API_AUTH = "http://localhost/api/auth";
-export const API_USERS = "http://localhost/api/users";
-export const API_CONTENT = "http://localhost/api/content";
+const VITE_API_URL = "192.168.100.12";
+export const API_AUTH = `http://${VITE_API_URL}/api/auth`;
+export const API_USERS = `http://${VITE_API_URL}/api/users`;
+export const API_CONTENT = `http://${VITE_API_URL}/api/content`;
