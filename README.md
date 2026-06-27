@@ -81,11 +81,13 @@ Após acessar o Grafana, vamos adicionar o data source do Prometheus. Vá em Con
 
 ## Dashboards de exemplo no Grafana
 
-<img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-41-27" src="https://github.com/user-attachments/assets/78c202f3-aad0-43a1-8d2f-63b168dc3687" />
+<img width="1280" height="720" alt="Captura de tela de 2026-06-26 23-56-05" src="https://github.com/user-attachments/assets/32ff227c-41e9-4c67-9061-d01598996b2c" />
 
-<img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-57-52" src="https://github.com/user-attachments/assets/5e2ec8d5-e39b-44dc-83b2-3ec6ec256072" />
+<img width="1280" height="720" alt="Captura de tela de 2026-06-26 23-56-13" src="https://github.com/user-attachments/assets/264fedee-0256-4c00-a698-81eba0ce4051" />
 
 <img width="1280" height="720" alt="Captura de tela de 2026-06-23 21-59-47" src="https://github.com/user-attachments/assets/41628efb-0966-4bd7-a9c8-1d05edd86965" />
+
+<img width="3072" height="1856" alt="Captura de tela de 2026-06-26 12-42-18" src="https://github.com/user-attachments/assets/8607eeeb-14ac-4165-be19-af5048d03cba" />
 
 
 ## Logs da aplicação
@@ -94,9 +96,16 @@ logs do customer-service rodando e enviando mensagens para o content-service via
 
 <img width="3072" height="1856" alt="image" src="https://github.com/user-attachments/assets/684dc642-915a-4d44-ae24-97d8ad306fae" />
 
+Usuários realizando login
+<img width="3072" height="1856" alt="Captura de tela de 2026-06-26 12-33-56" src="https://github.com/user-attachments/assets/215a94e1-3ea4-48dd-bdd5-05fb751e4804" />
+
+
+
 logs do content-service recebendo as mensagens:
 
 <img width="3072" height="1856" alt="image" src="https://github.com/user-attachments/assets/5acbd393-e78c-479f-ba9e-028bc5a9fb49" />
+
+<img width="3072" height="1856" alt="Captura de tela de 2026-06-26 15-56-30" src="https://github.com/user-attachments/assets/cfae4c48-a4d3-4a6e-96e9-0b1f6b964530" />
 
 
 ## Dashboard RabbitMQ
