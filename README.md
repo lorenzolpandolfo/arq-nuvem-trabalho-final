@@ -1,24 +1,37 @@
-# arq-nuvem-trabalho-final
+# Arquitetura de Computação em Núvem - Trabalho final
 Trabalho final da disciplina de Arquitetura de Computação em Núvem do UniSenac.
 
 
 ## Arquitetura de Solução
 
-links
+### Diagrama cenário ideal - produção
+Este diagrama mostra o cenário ideal para produção, com algumas ferramentas que não conseguimos implementar de verdade, como um cluster Kubernetes real, um linkerd como service-mesh e estruturas como WAF e CDN. 
+
+<img width="980" height="1900" alt="diagrama_ideal" src="https://github.com/user-attachments/assets/47cd444d-fc84-4cd1-9731-70fbaeb15abc" />
+
+### Diagrama do projeto - implementado
+A imagem abaixo mostra como o projeto final ficou estruturado de forma real. As ferramentas demonstradas estão presentes no projeto.
+<img width="980" height="1580" alt="diagrama_projeto" src="https://github.com/user-attachments/assets/c7689aad-503b-443a-904f-c2b7e16a753d" />
+
+### Diagrama arquitetura AWS
+O diagrama abaixo mostra como ficaria a arquitetura do projeto rodando na infraestrutura da AWS, com uma núvem privada, zonas de disponibilidade e réplicas das instâncias em EC2s.
+
+<img width="660" height="740" alt="diagrama_aws" src="https://github.com/user-attachments/assets/f56c4efc-8aca-4ac4-82de-871cd299ccd9" />
 
 ### Diagrama backend e frontend
+Este diagrama foi feito para organizar o desenvolvimento do projeto, organizando quais dados o frontend vai consumir do backend. Ele reflete o estado final do projeto.
 
 <img width="2741" height="3668" alt="diagrama_backend_frontend" src="https://github.com/user-attachments/assets/14d7f46d-33f6-4ffc-82a4-73dee288ca26" />
 
-
+---
 
 ## Tecnologias utilizadas
 
-- Frontend: Typescript com React
-- Backend: Python com FastAPI
-- API Gateway local: Nginx
-- Monitoramento: Prometheus e Grafana
-- Documentação: OpenAPI
+- **Frontend**: Typescript com React
+- **Backend**: Python com FastAPI
+- **API Gateway**: Nginx
+- **Monitoramento**: Prometheus e Grafana
+- **Documentação**: OpenAPI
 
 # Setup
 
