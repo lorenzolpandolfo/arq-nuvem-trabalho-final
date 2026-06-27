@@ -6,6 +6,11 @@ Trabalho final da disciplina de Arquitetura de Computação em Núvem do UniSena
 
 links
 
+### Diagrama backend e frontend
+
+<img width="2741" height="3668" alt="diagrama_backend_frontend" src="https://github.com/user-attachments/assets/14d7f46d-33f6-4ffc-82a4-73dee288ca26" />
+
+
 
 ## Tecnologias utilizadas
 
