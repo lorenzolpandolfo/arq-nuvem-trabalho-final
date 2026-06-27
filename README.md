@@ -126,3 +126,11 @@ Retornar posts do feed (content-service):
 ```
 curl --location 'http://localhost/api/content/posts'
 ```
+
+
+## Troubleshooting
+
+Caso dê erro para conectar o gateway nos serviços, tente reiniciar os containers dos microsserviços:
+```bash
+docker restart <id_container>
+```
