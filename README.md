@@ -15,7 +15,7 @@ links
 - Monitoramento: Prometheus e Grafana
 - Documentação: OpenAPI
 
-## Setup
+# Setup
 
 Crie a network do docker para que os serviços se comuniquem com o rabbit:
 
@@ -24,16 +24,32 @@ docker network create backend
 ```
 
 
-## Iniciar Serviços Essenciais
+## Iniciar Serviços
 
-Para iniciar o RabbitMQ, Prometheus e Grafana, rode:
+Para iniciar os microsserviços, rode `docker compose up` no diretório raiz deles `customer-service` e `content-service`.
+Confira o `README.md` de cada um deles para mais informações.
+
+
+Depois de iniciar os microsserviços, inicie o Nginx, RabbitMQ, Prometheus e Grafana, com os comandos:
 ```bash
 docker compose down -v
 docker compose up
 ```
 
-Para iniciar os microsserviços, confira o `README.md` de cada um deles.
+por fim, inicie o frontend no diretório `app` com os comandos:
+```bash
+npm i
+npm run dev
+```
 
+## Troubleshooting
+
+Caso dê erro para conectar o gateway nos serviços, tente reiniciar os containers dos microsserviços:
+```bash
+docker restart <id_container>
+```
+
+---
 
 ## Monitoramento
 
@@ -128,9 +144,3 @@ curl --location 'http://localhost/api/content/posts'
 ```
 
 
-## Troubleshooting
-
-Caso dê erro para conectar o gateway nos serviços, tente reiniciar os containers dos microsserviços:
-```bash
-docker restart <id_container>
-```
