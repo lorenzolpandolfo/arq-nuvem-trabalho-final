@@ -1,0 +1,21 @@
+# Terraform state e variáveis sensíveis
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+*.tfvars
+!terraform.tfvars.example
+
+# Zips gerados pelo archive_file
+/tmp/*.zip
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Arquivos de override (uso local)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
