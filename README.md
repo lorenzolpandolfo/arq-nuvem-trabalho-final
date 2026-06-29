@@ -78,6 +78,8 @@ docker restart <id_container>
 
 # Infraestrutura AWS (Terraform)
 
+<img width="2304" height="1924" alt="diagrama-readme" src="https://github.com/user-attachments/assets/cccd873b-9162-473f-a7bb-7bbe7ccdab9a" />
+
 A pasta `terraform/` contém o código IaC para subir toda a aplicação na AWS, espelhando a arquitetura local em nuvem pública com alta disponibilidade.
 
 ```
